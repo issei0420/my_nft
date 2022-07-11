@@ -1,0 +1,21 @@
+{{ templates "header" .}}
+    <link rel="stylesheet" href="static/css/common.css">
+    <div class="contents">
+        <div class="menu-title">画像アップロード</div>
+        <div class="upload">
+            <form method="post" enctype="multipart/form-data">
+                <div class="upload-box">
+                    <div class="upload-box-contents">
+                        <p>ここにファイルをドロップ</p>
+                        <p>または</p>
+                        <input type="file" value="ファイルを選択" name="image">
+                    </div>
+                </div>
+                <div class="upload-submit">
+                    <input type="submit" value="アップロードして分割する">
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

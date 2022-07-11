@@ -1,0 +1,42 @@
+body {
+    margin: 0;
+}
+.header {
+    background-color: rgb(35, 35, 58);
+    color: rgb(232, 234, 216)
+}
+.header-contents ul {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+li {
+    padding: 0 2rem 0;
+}
+li:hover {
+    /* border-top: 5px solid rgb(35, 35, 58);
+    outline: 5px solid rgb(232, 234, 216);
+    box-sizing: border-box;
+    outline-offset: -5px; */
+    background-color: rgb(59, 59, 95);
+}
+.header-contents {
+    padding-left: 2rem;
+    height: 4rem;
+    line-height: 4rem;
+    display: flex;
+    justify-content: space-between;
+}
+.title {
+    font-size: 1.5rem;
+}
+.nft {
+    font-weight: bolder;
+    font-size: 1.2rem;
+}
+
+.menu-title {
+    margin: 1.5em 0;
+    font-size: 1.2rem;
+}

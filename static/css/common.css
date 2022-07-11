@@ -1,0 +1,41 @@
+.register {
+    text-align: right;
+}
+.register a{
+    color: #fff;
+    background-color: #f67f29;
+    padding: 0.5rem;
+    border-radius: 10px;
+    margin-right: 4rem;
+}
+.register a:hover {
+    color: #fff;
+    background: #f77112;
+}
+.menu-title {
+    text-align: center;
+}
+
+/* upload */
+.upload {
+    text-align: center;
+}
+.upload-box {
+    outline: dashed 1px;
+    background-color: rgb(242, 242, 242);
+    width: 33vw;
+    height: 20vw;
+    margin: 0 auto;
+    position: relative;
+}
+.upload-box-contents {
+    position: absolute;
+    margin: auto;
+    width: 30vw;
+    height: 160px;
+    inset: 0;
+}
+
+.upload-submit {
+    margin-top: 1rem;
+}
