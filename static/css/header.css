@@ -1,9 +1,9 @@
-body {
+/* body {
     margin: 0;
 }
 .header {
     background-color: rgb(35, 35, 58);
-    color: rgb(232, 234, 216)
+    color: rgb(232, 234, 216);
 }
 .header-contents ul {
     display: flex;
@@ -11,16 +11,19 @@ body {
     margin: 0;
     padding: 0;
 }
+.header-contents a {
+    color:inherit;
+    text-decoration: none;
+}
+.header-contents a:visited{
+    color: inherit;
+  }
 li {
     padding: 0 2rem 0;
 }
 li:hover {
-    /* border-top: 5px solid rgb(35, 35, 58);
-    outline: 5px solid rgb(232, 234, 216);
-    box-sizing: border-box;
-    outline-offset: -5px; */
-    background-color: rgb(59, 59, 95);
-}
+    text-decoration: underline;
+} 
 .header-contents {
     padding-left: 2rem;
     height: 4rem;
@@ -30,13 +33,11 @@ li:hover {
 }
 .title {
     font-size: 1.5rem;
+    padding-left: 1rem;
+    border-left: 1px solid rgb(232, 234, 216);
 }
 .nft {
     font-weight: bolder;
     font-size: 1.2rem;
-}
-
-.menu-title {
-    margin: 1.5em 0;
-    font-size: 1.2rem;
-}
+    padding-right: 1rem;
+} */

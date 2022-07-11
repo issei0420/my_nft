@@ -1,12 +1,19 @@
+/* common */
+.menu-title {
+    margin: 1.5em 0;
+    font-size: 1.2rem;
+}
+
+/* usrList */
 .register {
     text-align: right;
+    margin-bottom: 1rem;
 }
 .register a{
     color: #fff;
     background-color: #f67f29;
     padding: 0.5rem;
     border-radius: 10px;
-    margin-right: 4rem;
 }
 .register a:hover {
     color: #fff;
@@ -15,12 +22,15 @@
 .menu-title {
     text-align: center;
 }
+.contents {
+    padding: 0 2rem;
+}
 
 /* upload */
 .upload {
     text-align: center;
 }
-.upload-box {
+#upload-box {
     outline: dashed 1px;
     background-color: rgb(242, 242, 242);
     width: 33vw;
@@ -28,14 +38,13 @@
     margin: 0 auto;
     position: relative;
 }
-.upload-box-contents {
+#upload-box-contents {
     position: absolute;
     margin: auto;
     width: 30vw;
     height: 160px;
     inset: 0;
 }
-
 .upload-submit {
     margin-top: 1rem;
 }

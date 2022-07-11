@@ -1,0 +1,17 @@
+{{ template "header" .}}
+<div class="container">
+    <p class="text-center mt-3">抽選応募</p>
+    <form>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">応募口数</label>
+            <select class="form-select" aria-label="Default select example">
+                <option selected>未選択</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+          </div>
+          <a type="submit" class="btn btn btn-primary" href="/result" role="button">応募</a>
+    </form>
+</div>
+{{ template "footer" .}}

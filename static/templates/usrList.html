@@ -1,8 +1,45 @@
 {{ template "header" .}}
-<link rel="stylesheet" href="/static/css/common.css">
     <div class="contents">
-        <div class="register"><a>新規登録</a></button></div>
         <div class="menu-title">会員一覧</div>
+        <div class="register"><a class="btn danger" href="/register" role="button">新規登録</a>
+        </button></div>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">姓名</th>
+                <th scope="col">ニックネーム</th>
+                <th scope="col">メールアドレス</th>
+                <th scope="col">会社名</th>
+                <th scope="col">保有枚数</th>
+                <th scope="col">編集</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>齋木</td>
+                <td>Mark</td>
+                <td>Otto</td>
+                <td>@mdo</td>
+                <td>AAA</td>
+                <td><a class="btn btn-success" href="/register" role="button">編集</a></td>
+              </tr>
+              <tr>
+                <td>齋木</td>
+                <td>Jacob</td>
+                <td>Thornton</td>
+                <td>@fat</td>
+                <td>BBB</td>
+                <td><a class="btn btn-success" href="/register" role="button">編集</a></td>
+              </tr>
+              <tr>
+                <td>齋木</td>
+                <td>Jacob</td>
+                <td>Thornton</td>
+                <td>@fat</td>
+                <td>CCC</td>
+                <td><a class="btn btn-success" href="/register" role="button">編集</a></td>
+              </tr>
+            </tbody>
+          </table>
     </div>
-</body>
-</html>
+{{ template "footer" .}}

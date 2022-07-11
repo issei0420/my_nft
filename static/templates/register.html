@@ -1,0 +1,45 @@
+{{ template "header" .}}
+<div class="container mt-3">
+    <h3>新規登録</h3>
+    <form>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">姓</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">j名</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">ニックネーム</label>
+          <input type="password" class="form-control" id="exampleInputPassword1">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">メールアドレス</label>
+            <input type="password" class="form-control" id="exampleInputPassword1">
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">会社名</label>
+            <input type="password" class="form-control" id="exampleInputPassword1">
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">パスワード</label>
+            <input type="password" class="form-control" id="exampleInputPassword1">
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">権限</label>
+            <select class="form-select" aria-label="Default select example">
+                <option selected>未選択</option>
+                <option value="1">管理者</option>
+                <option value="2">出品者</option>
+                <option value="3">利用者</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">抽選口数</label>
+            <input type="password" class="form-control" id="exampleInputPassword1">
+          </div>
+        <button type="submit" class="btn btn-primary">登録</button>
+    </form>
+  </div>
+{{ template "footer" .}}

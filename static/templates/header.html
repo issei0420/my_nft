@@ -4,23 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/header.css">
     <title>NFT販売</title>
+    <link rel="stylesheet" href="/static/css/header.css">
+    <link rel="stylesheet" href="static/css/common.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
-    <div class="header">
-        <div class="header-contents">
-            <span class="nft">
-                NFT販売
-            </span>
-            <span class="title">管理サイト</span>
-            <span>
-                <ul>
-                    <li>会員一覧</li>
-                    <li>画像アップロード</li>
-                    <li>画像リスト</li>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand mb-0 h1" href="/">NFT販売</a>        
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse flex-row-reverse" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/">会員一覧</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/upload">画像アップロード</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/imgList">画像リスト</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  利用者メニュー
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><a class="dropdown-item" href="/lottery">抽選応募</a></li>
+                  <li><a class="dropdown-item" href="/myImgList">保有画像一覧</a></li>
                 </ul>
-            </span>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/login">ログアウト</a>
+              </li>
+            </ul>
+          </div>
         </div>
-    </div>
+      </nav>
 {{ end }}
