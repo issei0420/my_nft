@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"nft-site/view"
+	"text/template"
 )
 
 func Index() func(w http.ResponseWriter, rq *http.Request) {
@@ -12,8 +13,17 @@ func Index() func(w http.ResponseWriter, rq *http.Request) {
 	return hh
 }
 
-func Login() func(w http.ResponseWriter, rq *http.Request) {
-	tf := view.Page("login")
+// consumer
+func Login(utype string) func(w http.ResponseWriter, rq *http.Request) {
+	var tf *template.Template
+	switch utype {
+	case "consumer":
+		tf = view.Page("login/consumerLogin")
+	case "admin":
+		tf = view.Page("login/adminLogin")
+	case "seller":
+		tf = view.Page("login/sellerLogin")
+	}
 	hh := func(w http.ResponseWriter, rq *http.Request) {
 		er := tf.Execute(w, nil)
 		if er != nil {
