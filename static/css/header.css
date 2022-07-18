@@ -6,6 +6,7 @@ nav {
 .navbar-brand {
     font-size: 1.5rem !important;
     color: rgb(232, 234, 216) !important;
+    margin-left: 1rem;
 }
 .nav-link {
     padding: 0 1rem !important;

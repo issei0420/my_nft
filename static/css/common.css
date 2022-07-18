@@ -3,33 +3,11 @@
 .contents {
     margin: 0 5rem !important;
 }
-/* .title-parent {
-    position: relative;
+
+/* register */
+.container {
+    max-width: 960px !important;
 }
-.title-child {
-    position: absolute;
-    right: 0;
-} */
-/* .register {
-    text-align: right;
-    margin-bottom: 1rem;
-}
-.register a{
-    color: #fff;
-    background-color: #f67f29;
-    padding: 0.5rem;
-    border-radius: 10px;
-}
-.register a:hover {
-    color: #fff;
-    background: #f77112;
-}
-.menu-title {
-    text-align: center;
-}
-.contents {
-    padding: 0 2rem;
-} */
 
 /* upload */
 .upload {
