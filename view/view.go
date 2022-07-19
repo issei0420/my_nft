@@ -14,8 +14,8 @@ import (
 // ユーザごとに違うヘッダーを作る
 
 func Page(fname string) *template.Template {
-	tf, er := template.ParseFiles("static/templates/"+fname+".html",
-		"static/templates/header.html", "static/templates/footer.html")
+	tf, er := template.ParseFiles("templates/"+fname+".html",
+		"templates/header.html", "templates/footer.html")
 	if er != nil {
 		tf, _ = template.New("index").Parse("<html><body><h1>No Template</h1></body></html>")
 	}

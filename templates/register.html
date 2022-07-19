@@ -3,39 +3,39 @@
     <div class="register text-center fs-5">
       <span class="border-bottom border-secondary border-1 p-1">新規登録</span>
     </div>
-    <form>
+    <form action="/register" method="post">
         <label for="" class="form-label mt-3">姓名</label>
         <div class="input-group  mb-3">
-          <input type="text" aria-label="Last name" class="form-control" id="lastNameInput">
-          <input type="text" aria-label="First name" class="form-control" id="firsNameInput">
+          <input type="text" aria-label="Last name" class="form-control" id="lastNameInput" name="lastName">
+          <input type="text" aria-label="First name" class="form-control" id="firsNameInput" name="firstName">
         </div>
         <div class="mb-3">
           <label for="inputNickname" class="form-label">ニックネーム</label>
-          <input type="" class="form-control" id="inputNickname">
+          <input type="" class="form-control" id="inputNickname" name="nickname">
         </div>
         <div class="mb-3">
             <label for="inputMail" class="form-label">メールアドレス</label>
-            <input type="mail" class="form-control" id="inputMail">
+            <input type="mail" class="form-control" id="inputMail" name="mail">
           </div>
           <div class="mb-3">
             <label for="inputCompany" class="form-label">会社名</label>
-            <input type="" class="form-control" id="inputCompany">
+            <input type="" class="form-control" id="inputCompany" name="company">
           </div>
           <div class="mb-3">
             <label for="inputPassword" class="form-label">パスワード</label>
-            <input type="" class="form-control" id="inputPassword">
+            <input type="" class="form-control" id="inputPassword" name="password">
           </div>
           <div class="mb-3">
             <label for="selectUserType" class="form-label">権限</label>
-            <select class="form-select" aria-label="Default select example" id="selectUserType">
-                <option selected>未選択</option>
-                <option value="2">出品者</option>
-                <option value="3">利用者</option>
+            <select class="form-select" aria-label="Default select example" id="selectUserType" name="userType">
+                <option>未選択</option>
+                <option>出品者</option>
+                <option>利用者</option>
             </select>
           </div>
           <div class="mb-3">
             <label for="inputLotteryUnits" class="form-label">抽選口数</label>
-            <input type="password" class="form-control" id="inputLotteryUnits">
+            <input class="form-control" id="inputLotteryUnits" name="lotteryUnits">
           </div>
         <div class="text-center">
           <button type="submit" class="btn btn-primary">登録</button>
