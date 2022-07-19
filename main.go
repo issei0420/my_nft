@@ -1,12 +1,21 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
+	"log"
 	"net/http"
 	"nft-site/controller"
 	"os"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 func main() {
+	// database handle
+	var db *sql.DB
+	connectDB(db)
+
 	dir, _ := os.Getwd()
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(dir+"/static/"))))
 	http.HandleFunc("/", controller.Index())
@@ -22,4 +31,27 @@ func main() {
 	http.HandleFunc("/myImgList", controller.MyImgList())
 	http.HandleFunc("/myImage", controller.MyImage())
 	http.ListenAndServe("", nil)
+}
+
+func connectDB(db *sql.DB) {
+	// Capture connection properties.
+	cfg := mysql.Config{
+		User:   os.Getenv("DBUSER"),
+		Passwd: os.Getenv("DBPASS"),
+		Net:    "tcp",
+		Addr:   "127.0.0.1:3306",
+		DBName: "nft",
+	}
+	// Get a database handle.
+	var err error
+	db, err = sql.Open("mysql", cfg.FormatDSN())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pingErr := db.Ping()
+	if pingErr != nil {
+		log.Fatal(pingErr)
+	}
+	fmt.Println("Connected!")
 }
