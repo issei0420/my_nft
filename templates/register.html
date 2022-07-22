@@ -6,7 +6,7 @@
     <form action="/register" method="post">
         <label for="" class="form-label mt-3">姓名</label>
         <div class="input-group  mb-3">
-          <input type="text" aria-label="Last name" class="form-control" id="lastNameInput" name="lastName">
+          <input type="text" aria-label="Last name" class="form-control" id="lastNameInput" name="familyName">
           <input type="text" aria-label="First name" class="form-control" id="firsNameInput" name="firstName">
         </div>
         <div class="mb-3">
@@ -22,15 +22,15 @@
             <input type="" class="form-control" id="inputCompany" name="company">
           </div>
           <div class="mb-3">
-            <label for="inputPassword" class="form-label">パスワード</label>
+            <label for="inputPassword" class="form-label">パスワード (保存後は確認できません）</label>
             <input type="" class="form-control" id="inputPassword" name="password">
           </div>
           <div class="mb-3">
             <label for="selectUserType" class="form-label">権限</label>
             <select class="form-select" aria-label="Default select example" id="selectUserType" name="userType">
                 <option>未選択</option>
-                <option>出品者</option>
                 <option>利用者</option>
+                <option>出品者</option>
             </select>
           </div>
           <div class="mb-3">
@@ -38,7 +38,7 @@
             <input class="form-control" id="inputLotteryUnits" name="lotteryUnits">
           </div>
         <div class="text-center">
-          <button type="submit" class="btn btn-primary">登録</button>
+          <button type="submit" class="btn btn-primary">保存</button>
         </div>
     </form>
   </div>

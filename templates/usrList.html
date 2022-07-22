@@ -6,7 +6,7 @@
         <div class="text-end">
           <a href="/register" class="btn-secondary btn" role="button">新規登録</a>
         </div>
-        <table class="table">
+        <table class="table mb-5">
             <thead>
               <tr>
                 <th>利用者</th>
@@ -21,30 +21,41 @@
               </tr>
             </thead>
             <tbody>
+              {{ range .Consumers}}
               <tr>
-                <td>齋木</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-                <td>AAA</td>
-                <td><a class="btn btn-success btn-sm" href="/register" role="button">編集</a></td>
+                <td>{{ .FamilyName }} {{ .FirstName }}</td>
+                <td>{{ .Nickname }}</td>
+                <td>{{ .Mail }}</td>
+                <td>{{ .Company }}</td>
+                <td>_枚</td>
+                <td><a class="btn btn-secondary btn-sm" href="/register" role="button">編集</a></td>
+              </tr>
+              {{ end }}
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>出品者</th>
               </tr>
               <tr>
-                <td>齋木</td>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-                <td>BBB</td>
-                <td><a class="btn btn-success btn-sm" href="/register" role="button">編集</a></td>
+                <th scope="col">姓名</th>
+                <th scope="col">ニックネーム</th>
+                <th scope="col">メールアドレス</th>
+                <th scope="col">会社名</th>
+                <th scope="col">編集</th>
               </tr>
+            </thead>
+            <tbody>
+              {{ range .Sellers}}
               <tr>
-                <td>齋木</td>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-                <td>CCC</td>
-                <td><a class="btn btn-success btn-sm" href="/register" role="button">編集</a></td>
+                <td>{{ .FamilyName }} {{ .FirstName }}</td>
+                <td>{{ .Nickname }}</td>
+                <td>{{ .Mail }}</td>
+                <td>{{ .Company }}</td>
+                <td><a class="btn btn-secondary btn-sm" href="/register" role="button">編集</a></td>
               </tr>
+              {{ end }}
             </tbody>
           </table>
     </div>

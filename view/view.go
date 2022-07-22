@@ -1,6 +1,7 @@
 package view
 
 import (
+	"fmt"
 	"text/template"
 )
 
@@ -12,11 +13,13 @@ import (
 // }
 
 // ユーザごとに違うヘッダーを作る
+// ユーザーの種類ごとにmustParse
 
 func Page(fname string) *template.Template {
-	tf, er := template.ParseFiles("templates/"+fname+".html",
+	tf, err := template.ParseFiles("templates/"+fname+".html",
 		"templates/header.html", "templates/footer.html")
-	if er != nil {
+	if err != nil {
+		fmt.Println(err)
 		tf, _ = template.New("index").Parse("<html><body><h1>No Template</h1></body></html>")
 	}
 	return tf

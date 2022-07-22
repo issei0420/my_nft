@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"crypto/sha512"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,151 +11,193 @@ import (
 	"text/template"
 )
 
-func IndexHandler() func(w http.ResponseWriter, rq *http.Request) {
-	// switch controller depending on user's type
-	hh := UsrListHandler()
-	return hh
-}
-
-// consumer
-func LoginHandler(utype string) func(w http.ResponseWriter, rq *http.Request) {
-	var tf *template.Template
-	switch utype {
-	case "consumer":
-		tf = view.Page("login/consumerLogin")
-	case "admin":
-		tf = view.Page("login/adminLogin")
-	case "seller":
-		tf = view.Page("login/sellerLogin")
-	}
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		er := tf.Execute(w, nil)
-		if er != nil {
-			log.Fatal(er)
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	t := r.FormValue("table")
+	if r.Method == "POST" {
+		p, err := db.GetPassword(t, r.FormValue("mail"))
+		var msg string
+		if err != nil {
+			if err == sql.ErrNoRows {
+				msg = "アカウントが存在しません"
+			} else {
+				log.Fatal(err)
+			}
+		} else {
+			pbyte := []byte(r.FormValue("password"))
+			pHash := sha512.Sum512(pbyte)
+			xpHash := fmt.Sprintf("%x", pHash)
+			if xpHash != p {
+				msg = "パスワードが間違っています"
+			} else {
+				msg = "認証成功"
+				if t == "sellers" {
+					http.Redirect(w, r, "/upload", http.StatusFound)
+				} else {
+					http.Redirect(w, r, "/lottery", http.StatusFound)
+				}
+			}
+		}
+		fmt.Printf("ConsumerLoginHandler: %v\n", msg)
+	} else {
+		usr := r.FormValue("usr")
+		var tf *template.Template
+		if usr == "seller" {
+			tf = view.Page("login/sellerLogin")
+		} else {
+			tf = view.Page("login/consumerLogin")
+		}
+		err := tf.Execute(w, nil)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
-	return hh
 }
 
-func UsrListHandler() func(w http.ResponseWriter, rq *http.Request) {
+func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
+	tf := view.Page("login/adminLogin")
+	err := tf.Execute(w, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func SellerLoginHandler(w http.ResponseWriter, r *http.Request) {
+	tf := view.Page("login/sellerLogin")
+	err := tf.Execute(w, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func UsrList() func(w http.ResponseWriter, r *http.Request) {
 	tf := view.Page("usrList")
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		er := tf.Execute(w, nil)
-		if er != nil {
-			log.Fatal(er)
+
+	hh := func(w http.ResponseWriter, r *http.Request) {
+
+		type Users struct {
+			Consumers []db.Consumers
+			Sellers   []db.Sellers
+		}
+
+		cons, err := db.GetAllConsumers()
+		if err != nil {
+			log.Fatal(err)
+		}
+		slrs, err := db.GetAllSellers()
+		if err != nil {
+			log.Fatal(err)
+		}
+		usrs := Users{Consumers: cons, Sellers: slrs}
+
+		if err = tf.Execute(w, usrs); err != nil {
+			log.Fatal(err)
 		}
 	}
 	return hh
 }
 
-func RegisterHandler() func(w http.ResponseWriter, r *http.Request) {
+func Register() func(w http.ResponseWriter, r *http.Request) {
 	var tf *template.Template
 	hh := func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
-			id, cols, err := db.RegisterDb(r)
+			evls, err := db.RegisterDb(r)
 			if err != nil {
 				log.Fatal(err)
 			}
-			if len(cols) > 1 {
-				fmt.Println(cols)
+			if len(evls) > 1 {
+				fmt.Println(evls)
+				fmt.Println("すでに存在する値です")
 				tf = view.Page("register")
-				er := tf.Execute(w, nil)
-				if er != nil {
-					log.Fatal(er)
+				err := tf.Execute(w, nil)
+				if err != nil {
+					log.Fatal(err)
 				}
-				fmt.Println("cols が存在する")
 			} else {
-				tf = view.Page("usrList")
-				er := tf.Execute(w, nil)
-				if er != nil {
-					log.Fatal(er)
-				}
-				fmt.Println("colsがない")
+				http.Redirect(w, r, "/usrList", http.StatusFound)
 			}
-			fmt.Printf("Successully inserted! id: %d", id)
 		} else {
-			tf = view.Page("usrList")
-			er := tf.Execute(w, nil)
-			if er != nil {
-				log.Fatal(er)
+			tf = view.Page("register")
+			err := tf.Execute(w, nil)
+			if err != nil {
+				log.Fatal(err)
 			}
 		}
 	}
 	return hh
 }
 
-func UploadHander() func(w http.ResponseWriter, rq *http.Request) {
+func Upload() func(w http.ResponseWriter, r *http.Request) {
 	tf := view.Page("upload")
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		er := tf.Execute(w, nil)
-		if er != nil {
-			log.Fatal(er)
+	hh := func(w http.ResponseWriter, r *http.Request) {
+		err := tf.Execute(w, nil)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 	return hh
 }
 
-func ImgListHandler() func(w http.ResponseWriter, rq *http.Request) {
+func ImgList() func(w http.ResponseWriter, r *http.Request) {
 	tf := view.Page("imgList")
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		er := tf.Execute(w, nil)
-		if er != nil {
-			log.Fatal(er)
+	hh := func(w http.ResponseWriter, r *http.Request) {
+		err := tf.Execute(w, nil)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 	return hh
 }
 
-func ImageHandler() func(w http.ResponseWriter, rq *http.Request) {
+func Image() func(w http.ResponseWriter, r *http.Request) {
 	tf := view.Page("image")
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		er := tf.Execute(w, nil)
-		if er != nil {
-			log.Fatal(er)
+	hh := func(w http.ResponseWriter, r *http.Request) {
+		err := tf.Execute(w, nil)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 	return hh
 }
 
-func LotteryHandler() func(w http.ResponseWriter, rq *http.Request) {
+func Lottery() func(w http.ResponseWriter, r *http.Request) {
 	tf := view.Page("lottery")
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		er := tf.Execute(w, nil)
-		if er != nil {
-			log.Fatal(er)
+	hh := func(w http.ResponseWriter, r *http.Request) {
+		err := tf.Execute(w, nil)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 	return hh
 }
 
-func ResultHandler() func(w http.ResponseWriter, rq *http.Request) {
+func Result() func(w http.ResponseWriter, r *http.Request) {
 	tf := view.Page("result")
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		er := tf.Execute(w, nil)
-		if er != nil {
-			log.Fatal(er)
+	hh := func(w http.ResponseWriter, r *http.Request) {
+		err := tf.Execute(w, nil)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 	return hh
 }
 
-func MyImgListHandler() func(w http.ResponseWriter, rq *http.Request) {
+func MyImgList() func(w http.ResponseWriter, r *http.Request) {
 	tf := view.Page("myImgList")
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		er := tf.Execute(w, nil)
-		if er != nil {
-			log.Fatal(er)
+	hh := func(w http.ResponseWriter, r *http.Request) {
+		err := tf.Execute(w, nil)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 	return hh
 }
 
-func MyImageHandler() func(w http.ResponseWriter, rq *http.Request) {
+func MyImage() func(w http.ResponseWriter, r *http.Request) {
 	tf := view.Page("myImage")
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		er := tf.Execute(w, nil)
-		if er != nil {
-			log.Fatal(er)
+	hh := func(w http.ResponseWriter, r *http.Request) {
+		err := tf.Execute(w, nil)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 	return hh
