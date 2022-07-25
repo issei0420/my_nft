@@ -57,6 +57,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			} else {
 				// 認証成功
 				ses.Values["login"] = true
+				ses.Values["mail"] = r.FormValue("mail")
 				if t == "sellers" {
 					ses.Values["userType"] = "seller"
 					ses.Save(r, w)
@@ -223,79 +224,81 @@ func Register() func(w http.ResponseWriter, r *http.Request) {
 	return hh
 }
 
-func Upload() func(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("upload")
-	hh := func(w http.ResponseWriter, r *http.Request) {
-		err := tf.Execute(w, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
+func UploadHandler(w http.ResponseWriter, r *http.Request) {
+	sessionManager(w, r, "seller")
+	view.SellerParse()
+	err := view.ConsumerTemps.ExecuteTemplate(w, "upload.html", nil)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return hh
 }
 
-func ImgList() func(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("imgList")
-	hh := func(w http.ResponseWriter, r *http.Request) {
-		err := tf.Execute(w, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
+func ImgListHandler(w http.ResponseWriter, r *http.Request) {
+	sessionManager(w, r, "seller")
+	err := view.ConsumerTemps.ExecuteTemplate(w, "imgList.html", nil)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return hh
 }
 
-func Image() func(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("image")
-	hh := func(w http.ResponseWriter, r *http.Request) {
-		err := tf.Execute(w, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
+func ImageHandler(w http.ResponseWriter, r *http.Request) {
+	sessionManager(w, r, "seller")
+	err := view.ConsumerTemps.ExecuteTemplate(w, "image.html", nil)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return hh
 }
 
-func Lottery() func(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("lottery")
-	hh := func(w http.ResponseWriter, r *http.Request) {
-		err := tf.Execute(w, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
+func LotteryHandler(w http.ResponseWriter, r *http.Request) {
+	sessionManager(w, r, "consumer")
+	view.ConsumerParse()
+	err := view.ConsumerTemps.ExecuteTemplate(w, "lottery.html", nil)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return hh
 }
 
-func Result() func(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("result")
-	hh := func(w http.ResponseWriter, r *http.Request) {
-		err := tf.Execute(w, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
+func ResultHandler(w http.ResponseWriter, r *http.Request) {
+	sessionManager(w, r, "consuemer")
+	err := view.ConsumerTemps.ExecuteTemplate(w, "result.html", nil)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return hh
 }
 
-func MyImgList() func(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("myImgList")
-	hh := func(w http.ResponseWriter, r *http.Request) {
-		err := tf.Execute(w, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
+func MyImgListHandler(w http.ResponseWriter, r *http.Request) {
+	sessionManager(w, r, "consumer")
+	err := view.ConsumerTemps.ExecuteTemplate(w, "myImgList.html", nil)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return hh
 }
 
-func MyImage() func(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("myImage")
-	hh := func(w http.ResponseWriter, r *http.Request) {
-		err := tf.Execute(w, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
+func MyImageHandler(w http.ResponseWriter, r *http.Request) {
+	sessionManager(w, r, "consumer")
+	err := view.ConsumerTemps.ExecuteTemplate(w, "myImage.html", nil)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return hh
+}
+
+func sessionManager(w http.ResponseWriter, r *http.Request, u string) string {
+	// get session
+	ses, err := cs.Get(r, "login-session")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// check login status
+	flg := ses.Values["login"].(bool)
+	if !flg {
+		http.Redirect(w, r, "/admin/login", http.StatusFound)
+	}
+	// check user type
+	utype := ses.Values["userType"].(string)
+	if utype != u && utype != "admin" {
+		http.Error(w, err.Error(), http.StatusNotFound)
+	}
+	// get id
+	mail := ses.Values["mail"].(string)
+	return mail
 }

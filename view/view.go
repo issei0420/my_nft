@@ -9,6 +9,8 @@ var LoginTemps = template.Must(template.ParseFiles("templates/login/adminLogin.h
 	"templates/login/consumerLogin.html", "templates/login/sellerLogin.html"))
 
 var AdminTemps *template.Template
+var ConsumerTemps *template.Template
+var SellerTemps *template.Template
 
 func AdminParse() error {
 	tmps, err := template.ParseFiles("templates/header.html", "templates/footer.html",
@@ -18,6 +20,27 @@ func AdminParse() error {
 		return fmt.Errorf("AdminRender: %v", err)
 	}
 	AdminTemps = tmps
+	return nil
+}
+
+func ConsumerParse() error {
+	tmps, err := template.ParseFiles("templates/header.html", "templates/footer.html",
+		"templates/lottery.html", "templates/result.html", "templates/myImage.html",
+		"templates/myImgList.html")
+	if err != nil {
+		return fmt.Errorf("ConsumerParse: %v", err)
+	}
+	ConsumerTemps = tmps
+	return nil
+}
+
+func SellerParse() error {
+	tmps, err := template.ParseFiles("templates/header.html", "templates/footer.html",
+		"templates/upload.html", "templates/image.html", "templates/imgList.html")
+	if err != nil {
+		return fmt.Errorf("SellerParse: %v", err)
+	}
+	SellerTemps = tmps
 	return nil
 }
 
