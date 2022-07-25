@@ -15,7 +15,8 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(dir+"/static/"))))
 	http.HandleFunc("/login", handler.LoginHandler)            // seller & consumer
 	http.HandleFunc("/admin/login", handler.AdminLoginHandler) // admin
-	http.HandleFunc("/usrList", handler.UsrList())
+	http.HandleFunc("/logout", handler.LogoutHandler)
+	http.HandleFunc("/usrList", handler.UsrListHandler)
 	http.HandleFunc("/register", handler.Register())
 	http.HandleFunc("/upload", handler.Upload())
 	http.HandleFunc("/imgList", handler.ImgList())

@@ -10,7 +10,11 @@ import (
 	"nft-site/view"
 	"os"
 	"text/template"
+
+	"github.com/gorilla/sessions"
 )
+
+var cs *sessions.CookieStore = sessions.NewCookieStore([]byte("nft-session-key"))
 
 type Message struct {
 	Msg string
@@ -19,6 +23,13 @@ type Message struct {
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	t := r.FormValue("table")
 	if r.Method == "POST" {
+		// reset session
+		ses, err := cs.Get(r, "login-session")
+		if err != nil {
+			log.Fatal(err)
+		}
+		ses.Values["login"] = nil
+
 		p, err := db.GetPassword(t, r.FormValue("mail"))
 		var m Message
 		if err != nil {
@@ -28,9 +39,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				log.Fatal(err)
 			}
 			if t == "sellers" {
-				view.Templates.ExecuteTemplate(w, "sellerLogin.html", m)
+				view.LoginTemps.ExecuteTemplate(w, "sellerLogin.html", m)
 			} else {
-				view.Templates.ExecuteTemplate(w, "consumerLogin.html", m)
+				view.LoginTemps.ExecuteTemplate(w, "consumerLogin.html", m)
 			}
 		} else {
 			pbyte := []byte(r.FormValue("password"))
@@ -39,15 +50,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			if xpHash != p {
 				m.Msg = "パスワードが間違っています"
 				if t == "sellers" {
-					view.Templates.ExecuteTemplate(w, "sellerLogin.html", m)
+					view.LoginTemps.ExecuteTemplate(w, "sellerLogin.html", m)
 				} else {
-					view.Templates.ExecuteTemplate(w, "consumerLogin.html", m)
+					view.LoginTemps.ExecuteTemplate(w, "consumerLogin.html", m)
 				}
 			} else {
 				// 認証成功
+				ses.Values["login"] = true
 				if t == "sellers" {
+					ses.Values["userType"] = "seller"
+					ses.Save(r, w)
 					http.Redirect(w, r, "/upload", http.StatusFound)
 				} else {
+					ses.Values["userType"] = "consumer"
+					ses.Save(r, w)
 					http.Redirect(w, r, "/lottery", http.StatusFound)
 				}
 			}
@@ -55,12 +71,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		usr := r.FormValue("usr")
 		if usr == "seller" {
-			err := view.Templates.ExecuteTemplate(w, "sellerLogin.html", nil)
+			err := view.LoginTemps.ExecuteTemplate(w, "sellerLogin.html", nil)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		} else {
-			err := view.Templates.ExecuteTemplate(w, "consumerLogin.html", nil)
+			err := view.LoginTemps.ExecuteTemplate(w, "consumerLogin.html", nil)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -70,6 +86,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
+		// reset session
+		ses, err := cs.Get(r, "login-session")
+		if err != nil {
+			log.Fatal(err)
+		}
+		ses.Values["login"] = nil
 		// check ID
 		accnt, err := os.ReadFile("data/accnt.txt")
 		if err != nil {
@@ -80,7 +102,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		if r.FormValue("mail") != string(accnt) {
 			m.Msg = "IDが間違っています"
-			err := view.Templates.ExecuteTemplate(w, "adminLogin.html", m)
+			err := view.LoginTemps.ExecuteTemplate(w, "adminLogin.html", m)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -96,46 +118,79 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		xpHash := fmt.Sprintf("%x", pHash)
 		if xpHash != string(pswd) {
 			m.Msg = "パスワードが間違っています"
-			err = view.Templates.ExecuteTemplate(w, "adminLogin.html", m)
+			err = view.LoginTemps.ExecuteTemplate(w, "adminLogin.html", m)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		} else {
+			ses.Values["login"] = true
+			ses.Values["userType"] = "admin"
+			if ses.Save(r, w) != nil {
+				log.Fatal(ses.Save(r, w))
+			}
 			http.Redirect(w, r, "/usrList", http.StatusFound)
 		}
 	} else {
-		err := view.Templates.ExecuteTemplate(w, "adminLogin.html", nil)
+		err := view.LoginTemps.ExecuteTemplate(w, "adminLogin.html", nil)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
 }
 
-func UsrList() func(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("usrList")
-
-	hh := func(w http.ResponseWriter, r *http.Request) {
-
-		type Users struct {
-			Consumers []db.Consumers
-			Sellers   []db.Sellers
-		}
-
-		cons, err := db.GetAllConsumers()
-		if err != nil {
-			log.Fatal(err)
-		}
-		slrs, err := db.GetAllSellers()
-		if err != nil {
-			log.Fatal(err)
-		}
-		usrs := Users{Consumers: cons, Sellers: slrs}
-
-		if err = tf.Execute(w, usrs); err != nil {
-			log.Fatal(err)
-		}
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	ses, err := cs.Get(r, "login-session")
+	if err != nil {
+		log.Fatal()
 	}
-	return hh
+	ses.Values["login"] = false
+	err = ses.Save(r, w)
+	if err != nil {
+		log.Fatal(err)
+	}
+	utype := ses.Values["userType"].(string)
+	switch utype {
+	case "admin":
+		http.Redirect(w, r, "/admin/login", http.StatusFound)
+	case "seller":
+		http.Redirect(w, r, "/login?usr=seller", http.StatusFound)
+	default:
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+}
+
+func UsrListHandler(w http.ResponseWriter, r *http.Request) {
+	// check login status
+	ses, err := cs.Get(r, "login-session")
+	if err != nil {
+		log.Fatal(err)
+	}
+	flg := ses.Values["login"].(bool)
+	if !flg {
+		http.Redirect(w, r, "/admin/login", http.StatusFound)
+	}
+
+	view.AdminParse()
+
+	type Users struct {
+		Consumers []db.Consumers
+		Sellers   []db.Sellers
+	}
+
+	cons, err := db.GetAllConsumers()
+	if err != nil {
+		log.Fatal(err)
+	}
+	slrs, err := db.GetAllSellers()
+	if err != nil {
+		log.Fatal(err)
+	}
+	usrs := Users{Consumers: cons, Sellers: slrs}
+
+	err = view.AdminTemps.ExecuteTemplate(w, "usrList.html", usrs)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func Register() func(w http.ResponseWriter, r *http.Request) {
