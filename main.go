@@ -13,9 +13,8 @@ func main() {
 
 	dir, _ := os.Getwd()
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(dir+"/static/"))))
-	http.HandleFunc("/login", handler.LoginHandler)
-	// http.HandleFunc("/admin/login", handler.AdminLoginHandler)
-	// http.HandleFunc("/seller/login", handler.SellerLoginHandler)
+	http.HandleFunc("/login", handler.LoginHandler)            // seller & consumer
+	http.HandleFunc("/admin/login", handler.AdminLoginHandler) // admin
 	http.HandleFunc("/usrList", handler.UsrList())
 	http.HandleFunc("/register", handler.Register())
 	http.HandleFunc("/upload", handler.Upload())
@@ -27,3 +26,15 @@ func main() {
 	http.HandleFunc("/myImage", handler.MyImage())
 	http.ListenAndServe(":8080", nil)
 }
+
+// func write() {
+// 	pbyte := []byte("Th5RLynP")
+// 	pHash := sha512.Sum512(pbyte)
+// 	xpHash := fmt.Sprintf("%x", pHash)
+
+// 	err := os.WriteFile("data", []byte(xpHash), 0600)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	fmt.Println("File written!")
+// }

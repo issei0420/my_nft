@@ -54,18 +54,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("login/adminLogin")
-	err := tf.Execute(w, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+	if r.Method == "POST" {
 
-func SellerLoginHandler(w http.ResponseWriter, r *http.Request) {
-	tf := view.Page("login/sellerLogin")
-	err := tf.Execute(w, nil)
-	if err != nil {
-		log.Fatal(err)
+	} else {
+		tf := view.Page("login/adminLogin")
+		if err := tf.Execute(w, nil); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
