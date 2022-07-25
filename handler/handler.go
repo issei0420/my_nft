@@ -56,8 +56,19 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		pswd, err := os.ReadFile("data.txt")
-		fmt.Println(string(pswd))
+		// check account
+		accnt, err := os.ReadFile("data/accnt.txt")
+		if err != nil {
+			log.Fatal(err)
+		}
+		if r.FormValue("mail") == string(accnt) {
+			fmt.Println("アカウント存在")
+		} else {
+			fmt.Println("アカウントが存在しません。")
+		}
+
+		// check password
+		pswd, err := os.ReadFile("data/pswd.txt")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -66,6 +77,8 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		xpHash := fmt.Sprintf("%x", pHash)
 		if xpHash == string(pswd) {
 			fmt.Println("認証成功")
+		} else {
+			fmt.Println("パスワードが間違っています。")
 		}
 	} else {
 		tf := view.Page("login/adminLogin")
