@@ -14,6 +14,7 @@
         <form action="/login" method="post">
             <h1 class="h3 mb-3 form-title rounded-top">NFT 出品サイト</h1>
             <h1 class="h6 mb-3 fw-normal">ログインしてください</h1>
+            <h1 class="h6 mb-3 fw-normal text-danger">{{ .Msg }}</h1>
             <div class="form-floating">
                 <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="mail">
                 <label for="floatingInput">メールアドレス</label>

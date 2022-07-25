@@ -12,25 +12,39 @@ import (
 	"text/template"
 )
 
+type Message struct {
+	Msg string
+}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	t := r.FormValue("table")
 	if r.Method == "POST" {
 		p, err := db.GetPassword(t, r.FormValue("mail"))
-		var msg string
+		var m Message
 		if err != nil {
 			if err == sql.ErrNoRows {
-				msg = "アカウントが存在しません"
+				m.Msg = "アカウントが存在しません"
 			} else {
 				log.Fatal(err)
+			}
+			if t == "sellers" {
+				view.Templates.ExecuteTemplate(w, "sellerLogin.html", m)
+			} else {
+				view.Templates.ExecuteTemplate(w, "consumerLogin.html", m)
 			}
 		} else {
 			pbyte := []byte(r.FormValue("password"))
 			pHash := sha512.Sum512(pbyte)
 			xpHash := fmt.Sprintf("%x", pHash)
 			if xpHash != p {
-				msg = "パスワードが間違っています"
+				m.Msg = "パスワードが間違っています"
+				if t == "sellers" {
+					view.Templates.ExecuteTemplate(w, "sellerLogin.html", m)
+				} else {
+					view.Templates.ExecuteTemplate(w, "consumerLogin.html", m)
+				}
 			} else {
-				msg = "認証成功"
+				// 認証成功
 				if t == "sellers" {
 					http.Redirect(w, r, "/upload", http.StatusFound)
 				} else {
@@ -38,7 +52,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		fmt.Printf("ConsumerLoginHandler: %v\n", msg)
 	} else {
 		usr := r.FormValue("usr")
 		if usr == "seller" {
@@ -63,9 +76,6 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 
-		type Message struct {
-			Msg string
-		}
 		var m Message
 
 		if r.FormValue("mail") != string(accnt) {
@@ -86,10 +96,12 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		xpHash := fmt.Sprintf("%x", pHash)
 		if xpHash != string(pswd) {
 			m.Msg = "パスワードが間違っています"
-		}
-		err = view.Templates.ExecuteTemplate(w, "adminLogin.html", m)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			err = view.Templates.ExecuteTemplate(w, "adminLogin.html", m)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		} else {
+			http.Redirect(w, r, "/usrList", http.StatusFound)
 		}
 	} else {
 		err := view.Templates.ExecuteTemplate(w, "adminLogin.html", nil)
