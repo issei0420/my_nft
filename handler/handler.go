@@ -57,17 +57,25 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		// check account
+		// check ID
 		accnt, err := os.ReadFile("data/accnt.txt")
 		if err != nil {
 			log.Fatal(err)
 		}
-		if r.FormValue("mail") == string(accnt) {
-			fmt.Println("アカウント存在")
-		} else {
-			fmt.Println("アカウントが存在しません。")
-		}
 
+		type Message struct {
+			Msg string
+		}
+		var m Message
+
+		if r.FormValue("mail") != string(accnt) {
+			m.Msg = "IDが間違っています"
+			err := view.Templates.ExecuteTemplate(w, "adminLogin.html", m)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
 		// check password
 		pswd, err := os.ReadFile("data/pswd.txt")
 		if err != nil {
@@ -76,10 +84,12 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		pbyte := []byte(r.FormValue("password"))
 		pHash := sha512.Sum512(pbyte)
 		xpHash := fmt.Sprintf("%x", pHash)
-		if xpHash == string(pswd) {
-			fmt.Println("認証成功")
-		} else {
-			fmt.Println("パスワードが間違っています。")
+		if xpHash != string(pswd) {
+			m.Msg = "パスワードが間違っています"
+		}
+		err = view.Templates.ExecuteTemplate(w, "adminLogin.html", m)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	} else {
 		err := view.Templates.ExecuteTemplate(w, "adminLogin.html", nil)
