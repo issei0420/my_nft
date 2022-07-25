@@ -11,7 +11,7 @@
 </head>
 <body class="text-center">
     <main class="form-signin">
-        <form action="/usrList" method="post">
+        <form action="/admin/login" method="post">
             <h1 class="h3 mb-3 form-title rounded-top">NFT 管理サイト</h1>
             <h1 class="h6 mb-3 fw-normal">ログインしてください</h1>
             <div class="form-floating">
@@ -19,7 +19,7 @@
                 <label for="floatingInput">メールアドレス</label>
             </div>
             <div class="form-floating">
-                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
                 <label for="floatingPassword">パスワード</label>
             </div>
             <input type="hidden" name="table" value="admin">

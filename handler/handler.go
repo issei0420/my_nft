@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"nft-site/db"
 	"nft-site/view"
+	"os"
 	"text/template"
 )
 
@@ -55,7 +56,17 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-
+		pswd, err := os.ReadFile("data.txt")
+		fmt.Println(string(pswd))
+		if err != nil {
+			log.Fatal(err)
+		}
+		pbyte := []byte(r.FormValue("password"))
+		pHash := sha512.Sum512(pbyte)
+		xpHash := fmt.Sprintf("%x", pHash)
+		if xpHash == string(pswd) {
+			fmt.Println("認証成功")
+		}
 	} else {
 		tf := view.Page("login/adminLogin")
 		if err := tf.Execute(w, nil); err != nil {

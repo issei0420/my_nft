@@ -26,15 +26,3 @@ func main() {
 	http.HandleFunc("/myImage", handler.MyImage())
 	http.ListenAndServe(":8080", nil)
 }
-
-// func write() {
-// 	pbyte := []byte("Th5RLynP")
-// 	pHash := sha512.Sum512(pbyte)
-// 	xpHash := fmt.Sprintf("%x", pHash)
-
-// 	err := os.WriteFile("data", []byte(xpHash), 0600)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	fmt.Println("File written!")
-// }
