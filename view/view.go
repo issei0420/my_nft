@@ -5,15 +5,8 @@ import (
 	"text/template"
 )
 
-// view
-// type Temps struct {
-// 	notemp *template.Template
-// 	indx   *template.Template
-// 	login  *template.Template
-// }
-
-// ユーザごとに違うヘッダーを作る
-// ユーザーの種類ごとにmustParse
+var Templates = template.Must(template.ParseFiles("templates/login/adminLogin.html",
+	"templates/login/consumerLogin.html", "templates/login/sellerLogin.html"))
 
 func Page(fname string) *template.Template {
 	tf, err := template.ParseFiles("templates/"+fname+".html",

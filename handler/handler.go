@@ -41,15 +41,16 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("ConsumerLoginHandler: %v\n", msg)
 	} else {
 		usr := r.FormValue("usr")
-		var tf *template.Template
 		if usr == "seller" {
-			tf = view.Page("login/sellerLogin")
+			err := view.Templates.ExecuteTemplate(w, "sellerLogin.html", nil)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 		} else {
-			tf = view.Page("login/consumerLogin")
-		}
-		err := tf.Execute(w, nil)
-		if err != nil {
-			log.Fatal(err)
+			err := view.Templates.ExecuteTemplate(w, "consumerLogin.html", nil)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 		}
 	}
 }
@@ -81,9 +82,9 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("パスワードが間違っています。")
 		}
 	} else {
-		tf := view.Page("login/adminLogin")
-		if err := tf.Execute(w, nil); err != nil {
-			log.Fatal(err)
+		err := view.Templates.ExecuteTemplate(w, "adminLogin.html", nil)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
 }
