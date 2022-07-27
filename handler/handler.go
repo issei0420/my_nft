@@ -4,6 +4,7 @@ import (
 	"crypto/sha512"
 	"database/sql"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"nft-site/db"
@@ -161,21 +162,14 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UsrListHandler(w http.ResponseWriter, r *http.Request) {
-	// check login status
-	ses, err := cs.Get(r, "login-session")
-	if err != nil {
-		log.Fatal(err)
-	}
-	flg := ses.Values["login"].(bool)
-	if !flg {
-		http.Redirect(w, r, "/admin/login", http.StatusFound)
-	}
+	_, utype := sessionManager(w, r, "admin")
 
 	view.AdminParse()
 
-	type Users struct {
+	type Item struct {
 		Consumers []db.Consumers
 		Sellers   []db.Sellers
+		UserType  string
 	}
 
 	cons, err := db.GetAllConsumers()
@@ -186,9 +180,9 @@ func UsrListHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	usrs := Users{Consumers: cons, Sellers: slrs}
+	item := Item{Consumers: cons, Sellers: slrs, UserType: utype}
 
-	err = view.AdminTemps.ExecuteTemplate(w, "usrList.html", usrs)
+	err = view.AdminTemps.ExecuteTemplate(w, "usrList.html", item)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -225,17 +219,77 @@ func Register() func(w http.ResponseWriter, r *http.Request) {
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
-	sessionManager(w, r, "seller")
-	view.SellerParse()
-	err := view.ConsumerTemps.ExecuteTemplate(w, "upload.html", nil)
-	if err != nil {
-		log.Fatal(err)
+	if r.Method == "POST" {
+		err := r.ParseMultipartForm(32 << 20)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// get file
+		f, _, err := r.FormFile("image")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer f.Close()
+
+		// insert into images
+		fn := r.FormValue("file-name")
+		id, err := db.InsertImage(fn)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// insert into upload
+		ses, _ := cs.Get(r, "login-session")
+		mail := ses.Values["mail"].(string)
+		err = db.InsertUpload(mail, id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// copy file
+		path := fmt.Sprintf("upload/%s", fn)
+		fd, err := os.Create(path)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer fd.Close()
+		io.Copy(fd, f)
+
+		http.Redirect(w, r, "/imgList", http.StatusFound)
+
+	} else {
+		_, utype := sessionManager(w, r, "seller")
+		view.SellerParse()
+		item := struct {
+			UserType string
+		}{
+			UserType: utype,
+		}
+		err := view.SellerTemps.ExecuteTemplate(w, "upload.html", item)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
 func ImgListHandler(w http.ResponseWriter, r *http.Request) {
-	sessionManager(w, r, "seller")
-	err := view.ConsumerTemps.ExecuteTemplate(w, "imgList.html", nil)
+	_, utype := sessionManager(w, r, "seller")
+	imgs, err := db.GetAllImages()
+	if err != nil {
+		log.Fatal(err)
+	}
+	item := struct {
+		UserType string
+		Images   []db.Image
+	}{
+		UserType: utype,
+		Images:   imgs,
+	}
+	err = view.SellerTemps.ExecuteTemplate(w, "imgList.html", item)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -243,7 +297,7 @@ func ImgListHandler(w http.ResponseWriter, r *http.Request) {
 
 func ImageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionManager(w, r, "seller")
-	err := view.ConsumerTemps.ExecuteTemplate(w, "image.html", nil)
+	err := view.SellerTemps.ExecuteTemplate(w, "image.html", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -259,7 +313,7 @@ func LotteryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ResultHandler(w http.ResponseWriter, r *http.Request) {
-	sessionManager(w, r, "consuemer")
+	sessionManager(w, r, "consumer")
 	err := view.ConsumerTemps.ExecuteTemplate(w, "result.html", nil)
 	if err != nil {
 		log.Fatal(err)
@@ -282,7 +336,7 @@ func MyImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func sessionManager(w http.ResponseWriter, r *http.Request, u string) string {
+func sessionManager(w http.ResponseWriter, r *http.Request, u string) (string, string) {
 	// get session
 	ses, err := cs.Get(r, "login-session")
 	if err != nil {
@@ -291,14 +345,23 @@ func sessionManager(w http.ResponseWriter, r *http.Request, u string) string {
 	// check login status
 	flg := ses.Values["login"].(bool)
 	if !flg {
-		http.Redirect(w, r, "/admin/login", http.StatusFound)
+		switch utype := ses.Values["userType"].(string); utype {
+		case "admin":
+			http.Redirect(w, r, "/admin/login", http.StatusFound)
+		case "seller":
+			http.Redirect(w, r, "/login?usr=seller", http.StatusFound)
+		case "consumer":
+			http.Redirect(w, r, "/login", http.StatusFound)
+		default:
+			http.Error(w, err.Error(), http.StatusNotFound)
+		}
 	}
 	// check user type
 	utype := ses.Values["userType"].(string)
 	if utype != u && utype != "admin" {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 	// get id
 	mail := ses.Values["mail"].(string)
-	return mail
+	return mail, utype
 }

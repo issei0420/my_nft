@@ -21,3 +21,8 @@ uploadBox.addEventListener('drop', function(e) {
     if (files.length > 1) return alert('アップロードできるファイルは1つだけです。');
     fileInput.files = files;
 }, false);
+
+fileInput.addEventListener('change', function(e) {
+    console.log("ファイル名：" + e.target.files[0].name);
+    document.getElementById('file-name').value = e.target.files[0].name;
+})

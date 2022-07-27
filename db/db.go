@@ -174,3 +174,60 @@ func GetPassword(t string, mail string) (string, error) {
 	}
 	return p, nil
 }
+
+func InsertImage(fn string) (int64, error) {
+	result, err := db.Exec("INSERT INTO images (file_name) VALUES (?)", fn)
+	if err != nil {
+		return 0, fmt.Errorf("InsertImage: %v", err)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("InsertImage: %v", err)
+	}
+	return id, nil
+}
+
+func InsertUpload(mail string, id int64) error {
+	_, err := db.Exec("Insert into upload (image_id, seller_id) values(?, (select id from sellers where mail = ?))", id, mail)
+	if err != nil {
+		return fmt.Errorf("InsertUpload: %v", err)
+	}
+	return nil
+}
+
+func GetSellerId(mail string) (int64, error) {
+	var id int64
+	row := db.QueryRow("SELECT id from sellers where mail = ?", mail)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return 0, fmt.Errorf("GetSellerId %s: No such seller", mail)
+		}
+		return 0, fmt.Errorf("GetSellerId %s: %v", mail, err)
+	}
+	return id, nil
+}
+
+type Image struct {
+	Filename   string
+	UploadDate string
+}
+
+func GetAllImages() ([]Image, error) {
+	var imgs []Image
+	rows, err := db.Query("SELECT file_name, created_at FROM images")
+	if err != nil {
+		return imgs, fmt.Errorf("GetAllImages: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var img Image
+		if err := rows.Scan(&img.Filename, &img.UploadDate); err != nil {
+			return nil, fmt.Errorf("getAllImages: %v", err)
+		}
+		imgs = append(imgs, img)
+	}
+	if err := rows.Err(); err != nil {
+		return imgs, fmt.Errorf("getAllImages: %v", err)
+	}
+	return imgs, nil
+}

@@ -10,6 +10,13 @@
           </tr>
         </thead>
         <tbody>
+          <!-- {{ range .Images }}
+          <tr>
+            <td>{{  .Filename }}</td>
+            <td>_枚</td>
+            <td>{{ .UploadDate }}</td>
+          </tr>
+          {{ end }} -->
           <tr>
             <td>画像1<a class="btn btn-link" href="/image" role="button">表示</a></td>
             <td>Otto</td>
@@ -21,7 +28,7 @@
             <td>@fat</td>
           </tr>
           <tr>
-            <td>画像3</td>
+            <td>{{ .Images }}</td>
             <td>AAA</td>
             <td>@twitter</td>
           </tr>

@@ -1,19 +1,20 @@
 {{ template "header" .}}
-<div class="contents">
-    <div class="menu-title">画像アップロード</div>
-    <div class="upload">
-        <form method="post" enctype="multipart/form-data" action="/imgList">
-            <div id="upload-box">
-                <div id="upload-box-contents">
-                    <p>ここにファイルをドロップ</p>
-                    <p>または</p>
-                    <input type="file" value="ファイルを選択" name="image" id="file-input">
-                </div>
-            </div>
-            <div class="upload-submit">
-                <input type="submit" value="アップロードして分割する">
-            </div>
-        </form>
+<div class="register text-center fs-5">
+    <span class="border-bottom border-secondary border-1 p-1">画像アップロード</span>
     </div>
+<div class="upload d-flex justify-content-center align-items-center">
+    <form method="post" enctype="multipart/form-data" action="/upload" class="text-center">
+        <div id="upload-box">
+            <div id="upload-box-contents text-center">
+                <p>ここにファイルをドロップ</p>
+                <p>または</p>
+                <input type="file" value="ファイルを選択" name="image" id="file-input">
+                <input type="hidden" id="file-name" name="file-name">
+            </div>
+        </div>
+        <div class="upload-submit mt-3">
+            <input type="submit" value="アップロード">
+        </div>
+    </form>
 </div>
 {{ template "footer" .}}
