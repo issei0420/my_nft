@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"nft-site/db"
+	"nft-site/lib"
 	"nft-site/view"
 	"os"
 	"text/template"
@@ -304,11 +305,61 @@ func ImageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LotteryHandler(w http.ResponseWriter, r *http.Request) {
-	sessionManager(w, r, "consumer")
-	view.ConsumerParse()
-	err := view.ConsumerTemps.ExecuteTemplate(w, "lottery.html", nil)
-	if err != nil {
-		log.Fatal(err)
+	if r.Method == "POST" {
+		imageId, units := r.FormValue("imageId"), r.FormValue("units")
+		ses, _ := cs.Get(r, "login-session")
+		mail := ses.Values["mail"].(string)
+		// get random portion
+		soldP, err := db.GetPortion(imageId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		randP, err := lib.RandomPortion(soldP, units)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		// insert into Lottery
+		id, err := db.InsertLottery(imageId, mail)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		// insert into portion
+		err = db.InsertPortion(id, randP)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		// update lottery_units
+		db.UpdateUnits(mail, units)
+	} else {
+		mail, utype := sessionManager(w, r, "consumer")
+		view.ConsumerParse()
+		// get all images
+		imgs, err := db.GetAllImages()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		// get Units
+		units, err := db.GetUnits(mail)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		var unitsSlice []int
+		for i := 0; i < units; i++ {
+			unitsSlice = append(unitsSlice, i+1)
+		}
+		item := struct {
+			UserType string
+			Images   []db.Image
+			Units    []int
+		}{
+			UserType: utype,
+			Images:   imgs,
+			Units:    unitsSlice,
+		}
+		err = view.ConsumerTemps.ExecuteTemplate(w, "lottery.html", item)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 

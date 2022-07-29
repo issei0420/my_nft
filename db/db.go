@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"crypto/sha512"
 
@@ -208,20 +209,21 @@ func GetSellerId(mail string) (int64, error) {
 }
 
 type Image struct {
+	Id         string
 	Filename   string
 	UploadDate string
 }
 
 func GetAllImages() ([]Image, error) {
 	var imgs []Image
-	rows, err := db.Query("SELECT file_name, created_at FROM images")
+	rows, err := db.Query("SELECT id, file_name, created_at FROM images")
 	if err != nil {
 		return imgs, fmt.Errorf("GetAllImages: %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var img Image
-		if err := rows.Scan(&img.Filename, &img.UploadDate); err != nil {
+		if err := rows.Scan(&img.Id, &img.Filename, &img.UploadDate); err != nil {
 			return nil, fmt.Errorf("getAllImages: %v", err)
 		}
 		imgs = append(imgs, img)
@@ -230,4 +232,69 @@ func GetAllImages() ([]Image, error) {
 		return imgs, fmt.Errorf("getAllImages: %v", err)
 	}
 	return imgs, nil
+}
+
+func InsertLottery(imageId string, mail string) (int64, error) {
+	result, err := db.Exec("INSERT INTO lottery (image_id, consumer_id)"+
+		"VALUES (?, (SELECT id FROM consumers WHERE mail=?))", imageId, mail)
+	if err != nil {
+		return 0, fmt.Errorf("InsertLottery: %v", err)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("InsertLottery: %v", err)
+	}
+	return id, nil
+}
+
+func InsertPortion(id int64, portion []uint8) error {
+	for _, p := range portion {
+		_, err := db.Exec("INSERT INTO portion (lottery_id, portion) VALUES(?, ?)", id, p)
+		if err != nil {
+			return fmt.Errorf("InsertPortion: %v", err)
+		}
+	}
+	return nil
+}
+
+func GetPortion(imageId string) ([]uint8, error) {
+	var soldP []uint8
+	rows, err := db.Query("SELECT portion FROM lottery INNER JOIN portion ON lottery.id = portion.lottery_id WHERE image_id=?", imageId)
+	if err != nil {
+		return nil, fmt.Errorf("GetPortion: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var p uint8
+		if err := rows.Scan(&p); err != nil {
+			return nil, fmt.Errorf("GetPortion: %v", err)
+		}
+		soldP = append(soldP, p)
+	}
+	return soldP, nil
+}
+
+func GetUnits(mail string) (int, error) {
+	row := db.QueryRow("SELECT lottery_units FROM consumers WHERE mail = ?", mail)
+	var units int
+	if err := row.Scan(&units); err != nil {
+		if err == sql.ErrNoRows {
+			return 0, fmt.Errorf("GetUnits %s: No such consumer", mail)
+		}
+		return 0, fmt.Errorf("GetUnits %s: %v", mail, err)
+	}
+	return units, nil
+}
+
+func UpdateUnits(mail string, units string) error {
+	fmt.Println(units)
+	u, err := strconv.Atoi(units)
+	if err != nil {
+		return fmt.Errorf("RandomPortion: %v", err)
+	}
+	_, err = db.Exec("UPDATE consumers SET lottery_units = lottery_units - ? WHERE mail=?", u, mail)
+	if err != nil {
+		return fmt.Errorf("UpdateUnits: %v", err)
+	}
+	return nil
 }

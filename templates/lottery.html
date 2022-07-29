@@ -1,17 +1,26 @@
 {{ template "header" .}}
 <div class="container">
     <p class="text-center mt-3">抽選応募</p>
-    <form>
+    <form action="/lottery" method="post">
           <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">応募口数</label>
-            <select class="form-select" aria-label="Default select example">
+            <label for="exampleInputPassword1" class="form-label">抽選画像</label>
+            <select class="form-select" aria-label="Default select example" name="imageId">
                 <option selected>未選択</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
+                {{ range .Images }}
+                <option value="{{ .Id }}">{{ .Filename }}</option>
+                {{ end }}
             </select>
           </div>
-          <a type="submit" class="btn btn btn-primary" href="/result" role="button">応募</a>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">応募口数</label>
+            <select class="form-select" aria-label="Default select example" name="units">
+                <option selected>未選択</option>
+                {{ range $v := .Units}}
+                <option value="{{$v}}">{{ $v }}</option>
+                {{ end }}
+            </select>
+          </div>
+          <input type="submit" class="btn btn btn-primary" role="button" value="応募">
     </form>
 </div>
 {{ template "footer" .}}

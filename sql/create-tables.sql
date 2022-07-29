@@ -71,5 +71,8 @@ CREATE TABLE lottery (
 DROP TABLE IF EXISTS portion;
 CREATE TABLE portion (
     lottery_id INT NOT NULL,
-    portion TINYINT NOT NULL
+    portion TINYINT NOT NULL,
+
+    FOREIGN KEY (lottery_id)
+        REFERENCES  lottery(id)
 );
