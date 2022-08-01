@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 
 	"crypto/sha512"
 
@@ -224,12 +223,12 @@ func GetAllImages() ([]Image, error) {
 	for rows.Next() {
 		var img Image
 		if err := rows.Scan(&img.Id, &img.Filename, &img.UploadDate); err != nil {
-			return nil, fmt.Errorf("getAllImages: %v", err)
+			return nil, fmt.Errorf("GetAllImages: %v", err)
 		}
 		imgs = append(imgs, img)
 	}
 	if err := rows.Err(); err != nil {
-		return imgs, fmt.Errorf("getAllImages: %v", err)
+		return imgs, fmt.Errorf("GetAllImages: %v", err)
 	}
 	return imgs, nil
 }
@@ -286,15 +285,48 @@ func GetUnits(mail string) (int, error) {
 	return units, nil
 }
 
-func UpdateUnits(mail string, units string) error {
-	fmt.Println(units)
-	u, err := strconv.Atoi(units)
-	if err != nil {
-		return fmt.Errorf("RandomPortion: %v", err)
-	}
-	_, err = db.Exec("UPDATE consumers SET lottery_units = lottery_units - ? WHERE mail=?", u, mail)
+func UpdateUnits(mail string, units int) error {
+	_, err := db.Exec("UPDATE consumers SET lottery_units = lottery_units - ? WHERE mail=?", units, mail)
 	if err != nil {
 		return fmt.Errorf("UpdateUnits: %v", err)
 	}
 	return nil
+}
+
+type MyImage struct {
+	Id       int
+	Filename string
+}
+
+func GetAllMyImages(mail string) ([]MyImage, error) {
+	var myImgs []MyImage
+	rows, err := db.Query("SELECT DISTINCT i.id, i.file_name FROM lottery l INNER JOIN images i ON l.image_id = i.id "+
+		"INNER JOIN consumers c ON l.consumer_id = c.id WHERE c.mail= ?", mail)
+	if err != nil {
+		return nil, fmt.Errorf("GetAllMyImages: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var myImg MyImage
+		if err := rows.Scan(&myImg.Id, &myImg.Filename); err != nil {
+			return nil, fmt.Errorf("GetAllMyImages: %v", err)
+		}
+		myImgs = append(myImgs, myImg)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("GetAllMyImages: %v", err)
+	}
+	return myImgs, nil
+}
+
+func IsExistImage(fn string) (bool, error) {
+	row := db.QueryRow("SELECT id FROM images WHERE file_name = ?", fn)
+	var id int
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return true, fmt.Errorf("IsExistImage: %v", err)
+	}
+	return true, nil
 }

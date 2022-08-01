@@ -235,11 +235,29 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		defer f.Close()
 
-		// insert into images
+		// check if its unique
 		fn := r.FormValue("file-name")
+		exist, err := db.IsExistImage(fn)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if exist {
+			item := struct {
+				UserType string
+				Message  string
+			}{
+				UserType: "seller",
+				Message:  "同名の画像がすでに出品されています。",
+			}
+			view.SellerTemps.ExecuteTemplate(w, "upload.html", item)
+			return
+		}
+		// insert into images
 		id, err := db.InsertImage(fn)
 		if err != nil {
-			log.Fatal(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		// insert into upload
 		ses, _ := cs.Get(r, "login-session")
@@ -267,8 +285,10 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		view.SellerParse()
 		item := struct {
 			UserType string
+			Message  string
 		}{
 			UserType: utype,
+			Message:  "",
 		}
 		err := view.SellerTemps.ExecuteTemplate(w, "upload.html", item)
 		if err != nil {
@@ -300,7 +320,8 @@ func ImageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionManager(w, r, "seller")
 	err := view.SellerTemps.ExecuteTemplate(w, "image.html", nil)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -313,23 +334,39 @@ func LotteryHandler(w http.ResponseWriter, r *http.Request) {
 		soldP, err := db.GetPortion(imageId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		randP, err := lib.RandomPortion(soldP, units)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		// insert into Lottery
 		id, err := db.InsertLottery(imageId, mail)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		// insert into portion
 		err = db.InsertPortion(id, randP)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		// update lottery_units
-		db.UpdateUnits(mail, units)
+		db.UpdateUnits(mail, len(randP))
+		item := struct {
+			Units    int
+			UserType string
+		}{
+			Units:    len(randP),
+			UserType: "consumer",
+		}
+		err = view.ConsumerTemps.ExecuteTemplate(w, "result.html", item)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	} else {
 		mail, utype := sessionManager(w, r, "consumer")
 		view.ConsumerParse()
@@ -337,11 +374,13 @@ func LotteryHandler(w http.ResponseWriter, r *http.Request) {
 		imgs, err := db.GetAllImages()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		// get Units
 		units, err := db.GetUnits(mail)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		var unitsSlice []int
 		for i := 0; i < units; i++ {
@@ -372,18 +411,43 @@ func ResultHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MyImgListHandler(w http.ResponseWriter, r *http.Request) {
-	sessionManager(w, r, "consumer")
-	err := view.ConsumerTemps.ExecuteTemplate(w, "myImgList.html", nil)
-	if err != nil {
-		log.Fatal(err)
+	if r.Method == "POST" {
+
+	} else {
+		mail, utype := sessionManager(w, r, "consumer")
+		myImgs, err := db.GetAllMyImages(mail)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		item := struct {
+			UserType string
+			MyImgs   []db.MyImage
+		}{
+			UserType: utype,
+			MyImgs:   myImgs,
+		}
+		err = view.ConsumerTemps.ExecuteTemplate(w, "myImgList.html", item)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
 func MyImageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionManager(w, r, "consumer")
-	err := view.ConsumerTemps.ExecuteTemplate(w, "myImage.html", nil)
+	fn := r.FormValue("filename")
+	item := struct {
+		UserType string
+		FileName string
+	}{
+		UserType: "consumer",
+		FileName: fn,
+	}
+	err := view.ConsumerTemps.ExecuteTemplate(w, "myImage.html", item)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 

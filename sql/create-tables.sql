@@ -4,7 +4,7 @@ CREATE TABLE sellers (
     family_name     VARCHAR(30) NOT NULL,
     first_name      VARCHAR(30) NOT NULL,
     nickname        VARCHAR(10) UNIQUE NOT NULL,
-    company    VARCHAR(137) NOT NULL,
+    company         VARCHAR(137) NOT NULL,
     mail            VARCHAR(254) UNIQUE NOT NULL,
     password        VARCHAR(128) NOT NULL,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -18,7 +18,7 @@ CREATE TABLE consumers (
     family_name      VARCHAR(30) NOT NULL,
     first_name       VARCHAR(30) NOT NULL,
     nickname         VARCHAR(10) UNIQUE NOT NULL,
-    company     VARCHAR(137) NOT NULL,
+    company          VARCHAR(137) NOT NULL,
     lottery_units    TINYINT NOT NULL,
     mail             VARCHAR(254) UNIQUE NOT NULL,
     password         VARCHAR(128) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE consumers (
 DROP TABLE IF EXISTS images;
 CREATE TABLE images (
     id            INT NOT NULL AUTO_INCREMENT,
-    file_name     VARCHAR(15) NOT NULL,
+    file_name     VARCHAR(30) UNIQUE NOT NULL,
     created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
@@ -41,8 +41,8 @@ CREATE TABLE upload (
     id             INT NOT NULL AUTO_INCREMENT,
     image_id       INT NOT NULL,
     seller_id      INT NOT NULL,
-    created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
 
     FOREIGN KEY (image_id)

@@ -27,8 +27,18 @@ func RandomPortion(soldP []uint8, units string) ([]uint8, error) {
 	if err != nil {
 		return nil, fmt.Errorf("RandomPortion: %v", err)
 	}
+
+	// limit lottery units
+	rem := 100 - len(soldP)
+	var lim int
+	if u < rem {
+		lim = u
+	} else {
+		lim = rem
+	}
+
 	var randP []uint8
-	for i := 0; i < u; i++ {
+	for i := 0; i < lim; i++ {
 		r := rand.Intn(len(lotP))
 		randP = append(randP, lotP[r])
 	}

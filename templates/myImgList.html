@@ -1,30 +1,20 @@
 {{ template "header" .}}
 <div class="contents">
-    <div class="menu-title">保有画像一覧</div>
-    <table class="table">
+    <div class="text-center fs-5">
+      <span class="border-bottom border-secondary border-1 p-1">保有画像一覧</span>
+    </div>
+    <table class="my-img-list table">
         <thead>
           <tr>
             <th scope="col">画像名</th>
-            <th scope="col">抽選済み枚数</th>
-            <th scope="col">登録日</th>
           </tr>
         </thead>
         <tbody>
+          {{ range .MyImgs }}
           <tr>
-            <td>画像1<a class="btn btn-link" href="/image" role="button">表示</a></td>
-            <td>Otto</td>
-            <td>@mdo</td>
+            <td>{{ .Filename }}<a class="btn btn-link" href="/myImage?id={{ .Id }}&filename={{ .Filename }}" role="button">表示</a></td>
           </tr>
-          <tr>
-            <td>画像2</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
-          <tr>
-            <td>画像3</td>
-            <td>AAA</td>
-            <td>@twitter</td>
-          </tr>
+          {{ end }}
         </tbody>
       </table>
 </div>
