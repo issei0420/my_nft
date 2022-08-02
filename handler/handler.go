@@ -437,6 +437,10 @@ func MyImgListHandler(w http.ResponseWriter, r *http.Request) {
 func MyImageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionManager(w, r, "consumer")
 	fn := r.FormValue("filename")
+	err := lib.ProcessImage(fn)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	item := struct {
 		UserType string
 		FileName string
@@ -444,7 +448,7 @@ func MyImageHandler(w http.ResponseWriter, r *http.Request) {
 		UserType: "consumer",
 		FileName: fn,
 	}
-	err := view.ConsumerTemps.ExecuteTemplate(w, "myImage.html", item)
+	err = view.ConsumerTemps.ExecuteTemplate(w, "myImage.html", item)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
