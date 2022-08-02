@@ -437,7 +437,15 @@ func MyImgListHandler(w http.ResponseWriter, r *http.Request) {
 func MyImageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionManager(w, r, "consumer")
 	fn := r.FormValue("filename")
-	err := lib.ProcessImage(fn)
+
+	getP := make(map[uint8]struct{})
+	for i := 0; i < 100; i++ {
+		if i%3 == 0 {
+			getP[uint8(i)] = struct{}{}
+		}
+	}
+
+	err := lib.ProcessImage(fn, getP)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

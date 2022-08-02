@@ -50,7 +50,7 @@ func RandomPortion(soldP []uint8, units string) ([]uint8, error) {
 	return randP, nil
 }
 
-func ProcessImage(fn string) error {
+func ProcessImage(fn string, getP map[uint8]struct{}) error {
 	path := fmt.Sprintf("upload/%s", fn)
 	src, err := os.Open(path)
 	if err != nil {
@@ -63,17 +63,36 @@ func ProcessImage(fn string) error {
 		return fmt.Errorf("ProcessImage_Decode: %v", err)
 	}
 	srcBounds := srcImg.Bounds()
-
 	dest := image.NewRGBA(srcBounds)
 
-	for v := srcBounds.Min.Y; v < srcBounds.Max.Y; v++ {
-		for h := srcBounds.Min.X; h < srcBounds.Max.X; h++ {
-			curlPixel := srcImg.At(h, v)
-			r, g, b, a := curlPixel.RGBA()
-			r, g, b, a = r>>8, g>>8, b>>8, a>>8
-			mean := (r + g + b) / 3
-			col := color.RGBA{R: uint8(mean), G: uint8(mean), B: uint8(mean), A: uint8(a)}
-			dest.Set(h, v, col)
+	height, width := srcBounds.Max.Y, srcBounds.Max.X
+	hUnit := height / 10
+	wUnit := width / 10
+
+	for p := 0; p < 100; p++ {
+		_, ok := getP[uint8(p)]
+		if ok {
+			for w := (p % 10) * wUnit; w < ((p%10)+1)*wUnit; w++ {
+				for h := (p / 10) * hUnit; h < ((p/10)+1)*hUnit; h++ {
+					pixel := srcImg.At(w, h)
+					r, g, b, a := pixel.RGBA()
+					r, g, b, a = r>>8, g>>8, b>>8, a>>8
+					mean := (r + g + b) / 3
+					a = a / 5 * 4
+					col := color.RGBA{R: uint8(mean), G: uint8(mean), B: uint8(mean), A: uint8(a)}
+					dest.Set(w, h, col)
+				}
+			}
+		} else {
+			for w := (p % 10) * wUnit; w < ((p%10)+1)*wUnit; w++ {
+				for h := (p / 10) * hUnit; h < ((p/10)+1)*hUnit; h++ {
+					pixel := srcImg.At(w, h)
+					r, g, b, a := pixel.RGBA()
+					r, g, b, a = r>>8, g>>8, b>>8, a>>8
+					col := color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}
+					dest.Set(w, h, col)
+				}
+			}
 		}
 	}
 
