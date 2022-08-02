@@ -13,7 +13,7 @@ func main() {
 
 	dir, _ := os.Getwd()
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(dir+"/static/"))))
-	http.Handle("/upload/", http.StripPrefix("/upload/", http.FileServer(http.Dir(dir+"/upload/"))))
+	http.Handle("/out/", http.StripPrefix("/out/", http.FileServer(http.Dir(dir+"/out/"))))
 	http.HandleFunc("/login", handler.LoginHandler)            // seller & consumer
 	http.HandleFunc("/admin/login", handler.AdminLoginHandler) // admin
 	http.HandleFunc("/logout", handler.LogoutHandler)
