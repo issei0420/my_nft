@@ -435,17 +435,21 @@ func MyImgListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MyImageHandler(w http.ResponseWriter, r *http.Request) {
-	sessionManager(w, r, "consumer")
+	mail, _ := sessionManager(w, r, "consumer")
 	fn := r.FormValue("filename")
+	id := r.FormValue("id")
 
+	getPs, err := db.GetMyPortion(id, mail)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	getP := make(map[uint8]struct{})
-	for i := 0; i < 100; i++ {
-		if i%3 == 0 {
-			getP[uint8(i)] = struct{}{}
-		}
+	for _, v := range getPs {
+		getP[uint8(v)] = struct{}{}
 	}
 
-	err := lib.ProcessImage(fn, getP)
+	err = lib.ProcessImage(fn, getP)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
