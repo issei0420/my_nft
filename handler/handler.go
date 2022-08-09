@@ -22,6 +22,27 @@ type Message struct {
 	Msg string
 }
 
+func RootHandler(w http.ResponseWriter, r *http.Request) {
+	// get session
+	ses, err := cs.Get(r, "login-session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// check user type
+	utype := ses.Values["userType"].(string)
+	switch utype {
+	case "consumer":
+		http.Redirect(w, r, "/lottery", http.StatusFound)
+	case "seller":
+		http.Redirect(w, r, "/upload", http.StatusFound)
+	case "admin":
+		http.Redirect(w, r, "/usrList", http.StatusFound)
+	default:
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	t := r.FormValue("table")
 	if r.Method == "POST" {
