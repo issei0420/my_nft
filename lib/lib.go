@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/draw"
 	_ "image/jpeg"
 	"image/png"
+	"log"
 	"math"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -89,7 +92,7 @@ func ProcessImage(fn string, getP map[uint8]struct{}) error {
 		}
 	}
 
-	// fill portions
+	// fill Portions
 	for _, p := range portions {
 		_, ok := getP[uint8(p)]
 		if !ok {
@@ -203,6 +206,122 @@ func ProcessImage(fn string, getP map[uint8]struct{}) error {
 	defer outfile.Close()
 
 	png.Encode(outfile, dest)
+
+	return nil
+}
+
+func SplitImage(fn string) error {
+	path := fmt.Sprintf("upload/%s", fn)
+	src, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("ProcessImage_Open: %v", err)
+	}
+	defer src.Close()
+
+	srcImg, _, err := image.Decode(src)
+	if err != nil {
+		return fmt.Errorf("ProcessImage_Decode: %v", err)
+	}
+	srcBounds := srcImg.Bounds()
+
+	height, width := srcBounds.Max.Y, srcBounds.Max.X
+	hUnit := int(math.Ceil(float64(height) / 10))
+	wUnit := int(math.Ceil(float64(width) / 10))
+	var hEdge, wEdge int
+
+	if hUnit/2 >= (height - hUnit*9) {
+		hUnit -= 1
+	}
+	if wUnit/2 >= (width - wUnit*9) {
+		wUnit -= 1
+	}
+	wEdge = width - wUnit*9
+	hEdge = height - hUnit*9
+
+	dirName := filepath.Base(fn[:len(fn)-len(filepath.Ext(fn))])
+	dirPath := filepath.Join("out", "original", dirName)
+
+	if err := os.RemoveAll(dirPath); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := os.Mkdir(dirPath, 0777); err != nil {
+		log.Fatal(err)
+	}
+
+	pEdge := map[int]struct{}{
+		9: {}, 19: {}, 29: {}, 39: {}, 49: {}, 59: {}, 69: {}, 79: {}, 89: {},
+		90: {}, 91: {}, 92: {}, 93: {}, 94: {}, 95: {}, 96: {}, 97: {}, 98: {}, 99: {},
+	}
+
+	var portions []int
+	for i := 0; i < 100; i++ {
+		if _, ok := pEdge[i]; !ok {
+			portions = append(portions, i)
+		}
+	}
+
+	// fill portions
+	for _, p := range portions {
+		dst := image.NewRGBA(image.Rect(0, 0, wUnit, hUnit))
+		draw.Draw(dst, srcBounds, srcImg, image.Pt((p%10)*wUnit, (p/10)*hUnit), draw.Src)
+
+		fileName := fmt.Sprintf("No_%s.png", strconv.Itoa(p))
+		outPath := filepath.Join(dirPath, fileName)
+		outfile, err := os.Create(outPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		png.Encode(outfile, dst)
+		outfile.Close()
+	}
+
+	// fill right side
+	for _, p := range []int{9, 19, 29, 39, 49, 59, 69, 79, 89} {
+		dst := image.NewRGBA(image.Rect(0, 0, wEdge, hUnit))
+		draw.Draw(dst, srcBounds, srcImg, image.Pt((p%10)*wUnit, (p/10)*hUnit), draw.Src)
+
+		fileName := fmt.Sprintf("No_%s.png", strconv.Itoa(p))
+		outPath := filepath.Join(dirPath, fileName)
+		outfile, err := os.Create(outPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		png.Encode(outfile, dst)
+		outfile.Close()
+	}
+
+	// fill bottom side
+	for _, p := range []int{90, 91, 92, 93, 94, 95, 96, 97, 98} {
+		dst := image.NewRGBA(image.Rect(0, 0, wUnit, hEdge))
+		draw.Draw(dst, srcBounds, srcImg, image.Pt((p%10)*wUnit, (p/10)*hUnit), draw.Src)
+
+		fileName := fmt.Sprintf("No_%s.png", strconv.Itoa(p))
+		outPath := filepath.Join(dirPath, fileName)
+		outfile, err := os.Create(outPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		png.Encode(outfile, dst)
+		outfile.Close()
+	}
+
+	// fill corner
+	dst := image.NewNRGBA(image.Rect(0, 0, wEdge, hEdge))
+	draw.Draw(dst, srcBounds, srcImg, image.Pt(9*wUnit, 9*hUnit), draw.Src)
+
+	fileName := fmt.Sprintf("No_%s.png", strconv.Itoa(99))
+	outPath := filepath.Join(dirPath, fileName)
+	outfile, err := os.Create(outPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	png.Encode(outfile, dst)
+	outfile.Close()
 
 	return nil
 }

@@ -1,15 +1,23 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"nft-site/db"
 	"nft-site/handler"
+	"nft-site/lib"
 	"os"
 )
 
 func main() {
 	// database handle
 	db.ConnectDb()
+
+	// test
+	err := lib.SplitImage("goodnotes.png")
+	if err != nil {
+		log.Fatal()
+	}
 
 	dir, _ := os.Getwd()
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(dir+"/static/"))))

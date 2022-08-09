@@ -274,6 +274,13 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			view.SellerTemps.ExecuteTemplate(w, "upload.html", item)
 			return
 		}
+
+		// split image
+		err = lib.SplitImage(fn)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
 		// insert into images
 		id, err := db.InsertImage(fn)
 		if err != nil {
