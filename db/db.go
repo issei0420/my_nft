@@ -348,3 +348,15 @@ func GetMyPortion(id, mail string) ([]uint8, error) {
 	}
 	return getP, nil
 }
+
+func GetFilenameFromId(id string) (string, error) {
+	row := db.QueryRow("SELECT file_name FROM images WHERE id = ?", id)
+	var fn string
+	if err := row.Scan(&fn); err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("GetFilenameFromId: No such image of id %s", id)
+		}
+		return "", fmt.Errorf("GetFilenameFromId: %v", err)
+	}
+	return fn, nil
+}

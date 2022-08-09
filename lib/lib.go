@@ -92,7 +92,7 @@ func ProcessImage(fn string, getP map[uint8]struct{}) error {
 	// fill portions
 	for _, p := range portions {
 		_, ok := getP[uint8(p)]
-		if ok {
+		if !ok {
 			for w := (p % 10) * wUnit; w < (p%10+1)*wUnit; w++ {
 				for h := (p / 10) * hUnit; h < (p/10+1)*hUnit; h++ {
 					// c := color.GrayModel.Convert(srcImg.At(w, h))
@@ -121,7 +121,7 @@ func ProcessImage(fn string, getP map[uint8]struct{}) error {
 	// fill right side
 	for _, p := range []int{9, 19, 29, 39, 49, 59, 69, 79, 89} {
 		_, ok := getP[uint8(p)]
-		if ok {
+		if !ok {
 			for w := (p % 10) * wUnit; w < width; w++ {
 				for h := (p / 10) * hUnit; h < (p/10+1)*hUnit; h++ {
 					pixel := srcImg.At(w, h)
@@ -148,7 +148,7 @@ func ProcessImage(fn string, getP map[uint8]struct{}) error {
 	// fill bottom side
 	for _, p := range []int{90, 91, 92, 93, 94, 95, 96, 97, 98} {
 		_, ok := getP[uint8(p)]
-		if ok {
+		if !ok {
 			for w := (p % 10) * wUnit; w < (p%10+1)*wUnit; w++ {
 				for h := (p / 10) * hUnit; h < height; h++ {
 					pixel := srcImg.At(w, h)
@@ -174,7 +174,7 @@ func ProcessImage(fn string, getP map[uint8]struct{}) error {
 
 	// fill corner
 	_, ok := getP[99]
-	if ok {
+	if !ok {
 		for w := 9 * wUnit; w < width; w++ {
 			for h := 9 * hUnit; h < height; h++ {
 				pixel := srcImg.At(w, h)

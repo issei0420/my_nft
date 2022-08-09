@@ -16,21 +16,17 @@
 #upload-box {
     outline: dashed 1px;
     background-color: rgb(242, 242, 242);
-    /* width: 33vw;
-    height: 20vw; */
-    /* margin: 0 auto;
-    position: relative; */
 }
 input#file-input {
     padding: auto !important;
 }
-/* #upload-box-contents {
-    position: absolute;
-    margin: auto;
-    width: 30vw;
-    height: 160px;
-    inset: 0;
+
+/* lottery*/
+#lottery-container {
+    max-width: 800px !important;
 }
-.upload-submit {
-    margin-top: 1rem;
-} */
+
+/* my-image-list */
+#my-image-list {
+    max-width: 800px !important;
+}

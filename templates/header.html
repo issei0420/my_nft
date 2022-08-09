@@ -29,16 +29,16 @@
             <div class="navbar-nav">
               {{ if eq .UserType "admin" }} 
                 <a class="nav-link active" aria-current="page" href="/usrList">会員一覧</a>
-                <a class="nav-link" href="/upload">画像アップロード</a>
-                <a class="nav-link" href="/imgList">画像リスト</a>
+                <a class="nav-link active" href="/upload">画像アップロード</a>
+                <a class="nav-link active" href="/imgList">画像リスト</a>
               {{ end }}
               {{ if eq .UserType "seller" }}
                 <a class="nav-link active" aria-current="page" href="/upload">画像アップロード</a>
-                <a class="nav-link" href="/imgList">画像リスト</a>
+                <a class="nav-link active" href="/imgList">画像リスト</a>
               {{ end }}
               {{ if eq .UserType "consumer" }}
                 <a class="nav-link active" aria-current="page" href="/lottery">抽選応募</a>
-                <a class="nav-link" href="/myImgList">保有画像一覧</a>
+                <a class="nav-link active" href="/myImgList">保有画像一覧</a>
               {{ end }}                     
             </div>
             <a class="nav-item mx-3 btn btn-outline-light btn-sm" type="button" href="/logout">ログアウト</a>

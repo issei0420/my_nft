@@ -23,7 +23,6 @@ func main() {
 	http.HandleFunc("/imgList", handler.ImgListHandler)
 	http.HandleFunc("/image", handler.ImageHandler)
 	http.HandleFunc("/lottery", handler.LotteryHandler)
-	http.HandleFunc("/result", handler.ResultHandler)
 	http.HandleFunc("/myImgList", handler.MyImgListHandler)
 	http.HandleFunc("/myImage", handler.MyImageHandler)
 	http.ListenAndServe(":8080", nil)

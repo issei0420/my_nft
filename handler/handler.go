@@ -358,9 +358,11 @@ func LotteryHandler(w http.ResponseWriter, r *http.Request) {
 		item := struct {
 			Units    int
 			UserType string
+			ImageId  string
 		}{
 			Units:    len(randP),
 			UserType: "consumer",
+			ImageId:  imageId,
 		}
 		err = view.ConsumerTemps.ExecuteTemplate(w, "result.html", item)
 		if err != nil {
@@ -402,14 +404,6 @@ func LotteryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ResultHandler(w http.ResponseWriter, r *http.Request) {
-	sessionManager(w, r, "consumer")
-	err := view.ConsumerTemps.ExecuteTemplate(w, "result.html", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func MyImgListHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 
@@ -436,8 +430,16 @@ func MyImgListHandler(w http.ResponseWriter, r *http.Request) {
 
 func MyImageHandler(w http.ResponseWriter, r *http.Request) {
 	mail, _ := sessionManager(w, r, "consumer")
-	fn := r.FormValue("filename")
 	id := r.FormValue("id")
+	fn := r.FormValue("filename")
+	if fn == "" {
+		var err error
+		fn, err = db.GetFilenameFromId(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 
 	getPs, err := db.GetMyPortion(id, mail)
 	if err != nil {
