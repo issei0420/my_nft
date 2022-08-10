@@ -1,15 +1,17 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"nft-site/api"
 	"nft-site/db"
 	"nft-site/handler"
 	"os"
 )
 
 func main() {
-	// database handle
 	db.ConnectDb()
+	api.StartApi()
 
 	dir, _ := os.Getwd()
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(dir+"/static/"))))
@@ -28,5 +30,8 @@ func main() {
 	http.HandleFunc("/", handler.RootHandler)
 	http.HandleFunc("/myImgList", handler.MyImgListHandler)
 	http.HandleFunc("/myImage", handler.MyImageHandler)
-	http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8081", nil)
+	if err != nil {
+		log.Fatal()
+	}
 }
