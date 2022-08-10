@@ -213,6 +213,27 @@ type Image struct {
 	UploadDate string
 }
 
+func GetSellerImages(mail string) ([]Image, error) {
+	var imgs []Image
+	rows, err := db.Query("SELECT i.id, i.file_name, i.created_at FROM upload u "+
+		"INNER JOIN images i ON u.image_id = i.id INNER JOIN sellers s ON u.seller_id = s.id WHERE s.mail = ?", mail)
+	if err != nil {
+		return imgs, fmt.Errorf("GetSellerImages: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var img Image
+		if err := rows.Scan(&img.Id, &img.Filename, &img.UploadDate); err != nil {
+			return nil, fmt.Errorf("GetSellerImages: %v", err)
+		}
+		imgs = append(imgs, img)
+	}
+	if err := rows.Err(); err != nil {
+		return imgs, fmt.Errorf("GetSellerImages: %v", err)
+	}
+	return imgs, nil
+}
+
 func GetAllImages() ([]Image, error) {
 	var imgs []Image
 	rows, err := db.Query("SELECT id, file_name, created_at FROM images")

@@ -211,16 +211,16 @@ func ProcessImage(fn string, getP map[uint8]struct{}) error {
 }
 
 func SplitImage(fn string) error {
-	path := fmt.Sprintf("upload/%s", fn)
+	path := filepath.Join("uploaded", fn)
 	src, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("ProcessImage_Open: %v", err)
+		return fmt.Errorf("SplitImage_Open: %v", err)
 	}
 	defer src.Close()
 
 	srcImg, _, err := image.Decode(src)
 	if err != nil {
-		return fmt.Errorf("ProcessImage_Decode: %v", err)
+		return fmt.Errorf("SplitImage_Decode: %v", err)
 	}
 	srcBounds := srcImg.Bounds()
 

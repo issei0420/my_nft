@@ -51,7 +51,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		ses.Values["login"] = nil
+		ses.Values["login"], ses.Values["mail"], ses.Values["userType"] = nil, nil, nil
 
 		p, err := db.GetPassword(t, r.FormValue("mail"))
 		var m Message
@@ -115,7 +115,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		ses.Values["login"] = nil
+		ses.Values["login"], ses.Values["mail"], ses.Values["userType"] = nil, nil, nil
 		// check ID
 		accnt, err := os.ReadFile("data/accnt.txt")
 		if err != nil {
@@ -129,8 +129,8 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 			err := view.LoginTemps.ExecuteTemplate(w, "adminLogin.html", m)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
-			return
 		}
 		// check password
 		pswd, err := os.ReadFile("data/pswd.txt")
@@ -148,6 +148,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			ses.Values["login"] = true
+			ses.Values["mail"] = string(accnt)
 			ses.Values["userType"] = "admin"
 			if ses.Save(r, w) != nil {
 				log.Fatal(ses.Save(r, w))
@@ -185,8 +186,11 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 func UsrListHandler(w http.ResponseWriter, r *http.Request) {
 	_, utype := sessionManager(w, r, "admin")
-
-	view.AdminParse()
+	err := view.AdminParse()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	type Item struct {
 		Consumers []db.Consumers
@@ -196,11 +200,13 @@ func UsrListHandler(w http.ResponseWriter, r *http.Request) {
 
 	cons, err := db.GetAllConsumers()
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	slrs, err := db.GetAllSellers()
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	item := Item{Consumers: cons, Sellers: slrs, UserType: utype}
 
@@ -275,10 +281,21 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// copy file
+		path := fmt.Sprintf("uploaded/%s", fn)
+		fd, err := os.Create(path)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer fd.Close()
+		io.Copy(fd, f)
+
 		// split image
 		err = lib.SplitImage(fn)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		// insert into images
@@ -295,16 +312,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		// copy file
-		path := fmt.Sprintf("upload/%s", fn)
-		fd, err := os.Create(path)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		defer fd.Close()
-		io.Copy(fd, f)
 
 		http.Redirect(w, r, "/imgList", http.StatusFound)
 
@@ -326,11 +333,21 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ImgListHandler(w http.ResponseWriter, r *http.Request) {
-	_, utype := sessionManager(w, r, "seller")
-	imgs, err := db.GetAllImages()
-	if err != nil {
-		log.Fatal(err)
+	mail, utype := sessionManager(w, r, "seller")
+	var imgs []db.Image
+	var err error
+	if utype == "seller" {
+		imgs, err = db.GetSellerImages(mail)
+	} else if utype == "admin" {
+		imgs, err = db.GetAllImages()
+	} else {
+		log.Fatal("ImgListHandler: invalid usertype")
 	}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	item := struct {
 		UserType string
 		Images   []db.Image
@@ -515,6 +532,7 @@ func sessionManager(w http.ResponseWriter, r *http.Request, u string) (string, s
 			http.Redirect(w, r, "/login", http.StatusFound)
 		default:
 			http.Error(w, err.Error(), http.StatusNotFound)
+			return "", ""
 		}
 	}
 	// check user type

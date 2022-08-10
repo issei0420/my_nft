@@ -2,6 +2,7 @@ package view
 
 import (
 	"fmt"
+	"log"
 	"text/template"
 )
 
@@ -48,7 +49,7 @@ func Page(fname string) *template.Template {
 	tf, err := template.ParseFiles("templates/"+fname+".html",
 		"templates/header.html", "templates/footer.html")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		tf, _ = template.New("index").Parse("<html><body><h1>No Template</h1></body></html>")
 	}
 	return tf
