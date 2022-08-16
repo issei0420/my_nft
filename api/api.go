@@ -1,13 +1,11 @@
 package api
 
 import (
-	"encoding/base64"
-	"log"
+	"encoding/json"
+	"fmt"
 	"net/http"
-	"os"
+	"nft-site/lib"
 	"path/filepath"
-
-	"github.com/gin-gonic/gin"
 )
 
 type image struct {
@@ -16,38 +14,46 @@ type image struct {
 
 var images []image
 
-func GetImages(c *gin.Context) {
-	data := encode()
-	img := image{Code: data}
-	images = append(images, img)
-	c.IndentedJSON(http.StatusOK, images)
+type response struct {
+	Images []image `json:"images"`
+	Width  int     `json:"width"`
 }
 
-//エンコード
-func encode() string {
-	path := filepath.Join("uploaded/rena.png")
-	file, err := os.Open(path)
-	if err != nil {
-		log.Fatal(err)
+func GetImages(w http.ResponseWriter, r *http.Request) {
+	fn := r.FormValue("filename")
+	name := filepath.Base(fn[:len(fn)-len(filepath.Ext(fn))])
+	var part, path, code string
+	var img image
+	var err error
+	for i := 0; i < 100; i++ {
+		part = fmt.Sprintf("No_%d.png", i)
+		path = filepath.Join("out/original", name, part)
+		code, err = lib.Encode(path)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		img = image{Code: code}
+		images = append(images, img)
 	}
-	defer file.Close()
 
-	fi, err := file.Stat() //FileInfo interface
+	// 画像のwidthを取得
+	imgPath := filepath.Join("uploaded", fn)
+	width, err := lib.GetWidth(imgPath)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	size := fi.Size() //ファイルサイズ
 
-	data := make([]byte, size)
-	file.Read(data)
+	res := response{Images: images, Width: width}
 
-	return base64.StdEncoding.EncodeToString(data)
-}
-
-func StartApi() {
-	// gin.SetMode(gin.ReleaseMode)
-	router := gin.Default()
-	router.GET("/images", GetImages)
-
-	router.Run("localhost:8080")
+	// JSONに変換
+	b, err := json.MarshalIndent(res, "", "\t")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
+	fmt.Printf("b: %s\n", b)
+	images = nil
 }

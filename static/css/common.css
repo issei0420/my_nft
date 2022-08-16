@@ -30,3 +30,11 @@ input#file-input {
 #my-image-list {
     max-width: 800px !important;
 }
+
+/* image */
+#divImage {
+	display: flex !important;
+	flex-wrap: wrap; 
+    margin: auto !important;
+    margin-top: 1.5rem !important;
+}

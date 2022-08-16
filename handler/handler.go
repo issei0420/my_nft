@@ -362,8 +362,16 @@ func ImgListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ImageHandler(w http.ResponseWriter, r *http.Request) {
-	sessionManager(w, r, "seller")
-	err := view.SellerTemps.ExecuteTemplate(w, "image.html", nil)
+	fn := r.FormValue("filename")
+	item := struct {
+		UserType string
+		FileName string
+	}{
+		UserType: "seller",
+		FileName: fn,
+	}
+
+	err := view.SellerTemps.ExecuteTemplate(w, "image.html", item)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

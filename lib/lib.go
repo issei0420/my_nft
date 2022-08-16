@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/base64"
 	"fmt"
 	"image"
 	"image/color"
@@ -324,4 +325,39 @@ func SplitImage(fn string) error {
 	outfile.Close()
 
 	return nil
+}
+
+//エンコード
+func Encode(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	fi, err := file.Stat() //FileInfo interface
+	if err != nil {
+		return "", err
+	}
+	size := fi.Size() //ファイルサイズ
+
+	data := make([]byte, size)
+	file.Read(data)
+
+	return base64.StdEncoding.EncodeToString(data), err
+}
+
+func GetWidth(path string) (int, error) {
+	src, err := os.Open(path)
+	if err != nil {
+		return 0, fmt.Errorf("GetWidth_Open: %v", err)
+	}
+	defer src.Close()
+
+	srcImg, _, err := image.Decode(src)
+	if err != nil {
+		return 0, fmt.Errorf("GetWidth_Decode: %v", err)
+	}
+	srcBounds := srcImg.Bounds()
+	return srcBounds.Max.X, nil
 }
