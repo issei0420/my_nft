@@ -2,5 +2,5 @@ data/data.txt
 data/accnt.txt
 uploaded/*
 out/*
-go.mod
 go.sum
+go.mod
