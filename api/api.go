@@ -4,19 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"nft-site/db"
 	"nft-site/lib"
 	"path/filepath"
 )
 
 type image struct {
+	Id   int    `json:"id"`
 	Code string `json:"code"`
 }
 
 var images []image
 
 type response struct {
-	Images []image `json:"images"`
-	Width  int     `json:"width"`
+	Images   []image      `json:"images"`
+	Width    int          `json:"width"`
+	Portions []db.Portion `json:"portions"`
 }
 
 func GetImages(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +36,7 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		img = image{Code: code}
+		img = image{Id: i, Code: code}
 		images = append(images, img)
 	}
 
@@ -45,7 +48,18 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := response{Images: images, Width: width}
+	// 抽選済み部の情報を取得
+	portions, err := db.GetSoldPortions(fn)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	res := response{
+		Images:   images,
+		Width:    width,
+		Portions: portions,
+	}
 
 	// JSONに変換
 	b, err := json.MarshalIndent(res, "", "\t")

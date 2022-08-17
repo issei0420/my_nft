@@ -56,7 +56,7 @@ func RandomPortion(soldP []uint8, units string) ([]uint8, error) {
 }
 
 func ProcessImage(fn string, getP map[uint8]struct{}) error {
-	path := fmt.Sprintf("upload/%s", fn)
+	path := fmt.Sprintf("uploaded/%s", fn)
 	src, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("ProcessImage_Open: %v", err)

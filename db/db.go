@@ -381,3 +381,33 @@ func GetFilenameFromId(id string) (string, error) {
 	}
 	return fn, nil
 }
+
+type Portion struct {
+	PId        string `json:"pId"`
+	UserID     string `json:"userId"`
+	FamilyName string `json:"familyName"`
+	FirstName  string `json:"firstName"`
+	Date       string `json:"date"`
+}
+
+func GetSoldPortions(fn string) ([]Portion, error) {
+	var portions []Portion
+	rows, err := db.Query("select p.portion, c.id, c.family_name, c.first_name, l.updated_at from lottery l "+
+		"inner join images i on l.image_id = i.id inner join consumers c on l.consumer_id = c.id "+
+		"inner join portion p on l.id = p.lottery_id where i.file_name = ?", fn)
+	if err != nil {
+		return nil, fmt.Errorf("GetSoldPortions: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var p Portion
+		if err := rows.Scan(&p.PId, &p.UserID, &p.FamilyName, &p.FirstName, &p.Date); err != nil {
+			return nil, fmt.Errorf("GetSoldPortions: %v", err)
+		}
+		portions = append(portions, p)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("GetSoldPortions: %v", err)
+	}
+	return portions, nil
+}
