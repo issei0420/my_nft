@@ -31,7 +31,7 @@ function showImages() {
         // グレースケール化の関数を画像ロード時に実行
         for (const key in portionData) {
             const img = document.getElementById(key);
-            img.onload = function(e) {
+            img.onload = function() {
                 if (!img.classList.contains("gray")) {
                     fillGray(img);
                     img.setAttribute("class", "gray")
@@ -45,15 +45,11 @@ function showImages() {
 function fillGray(img) {
     const width = img.width;
     const height = img.height;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
 
-    const testCanvas = document.getElementById("testCanvas");
-    testCanvas.style.width = width + "px";
-    testCanvas.style.height = height + "px";
-    // const canvas = document.createElement("canvas");
-    // canvas.style.width = width
-    // canvas.style.height = height
-    // console.log(canvas);
-    const context = testCanvas.getContext("2d");
+    const context = canvas.getContext("2d");
     context.drawImage(img, 0, 0);
 
     const imgData = context.getImageData(0, 0, width, height);
@@ -69,6 +65,6 @@ function fillGray(img) {
     }
     context.putImageData(imgData, 0, 0)
 
-    url = testCanvas.toDataURL();
+    url = canvas.toDataURL();
     img.src = url;
 }
