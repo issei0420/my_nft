@@ -14,7 +14,7 @@
         <tbody>
           {{ range .Images }}
           <tr>
-            <td>{{ .Filename }}<a class="btn btn-link" href="/image?filename={{ .Filename }}" role="button">表示</a></td>
+            <td><a class="btn btn-link" href="/image?filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
             <td>_枚</td>
             <td>{{ .UploadDate }}</td>
           </tr>

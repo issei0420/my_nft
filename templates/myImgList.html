@@ -12,7 +12,7 @@
         <tbody>
           {{ range .MyImgs }}
           <tr>
-            <td>{{ .Filename }}<a class="btn btn-link" href="/myImage?id={{ .Id }}&filename={{ .Filename }}" role="button">表示</a></td>
+            <td><a class="btn btn-link" href="/myImage?id={{ .Id }}&filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
           </tr>
           {{ end }}
         </tbody>
