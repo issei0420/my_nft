@@ -362,12 +362,13 @@ func ImgListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ImageHandler(w http.ResponseWriter, r *http.Request) {
+	_, utype := sessionManager(w, r, "seller")
 	fn := r.FormValue("filename")
 	item := struct {
 		UserType string
 		FileName string
 	}{
-		UserType: "seller",
+		UserType: utype,
 		FileName: fn,
 	}
 

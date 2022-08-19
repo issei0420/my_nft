@@ -1,9 +1,16 @@
+
+
 window.addEventListener('DOMContentLoaded', function() {
     showImages();
 });
 
-let portionData = {};
+let portionInfo = {};
 let flag = true;
+
+const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
 
 function showImages() {
     const divImage = document.getElementById("divImage")
@@ -19,25 +26,35 @@ function showImages() {
             imageElement.setAttribute("id", elem["id"])
             divImage.appendChild(imageElement);
         }
-        // 抽選部位データをセット
+        // portionInfoの準備
         for (const elem of resObj["portions"]) {
-            portionData[elem["pId"]] = {
+            portionInfo[elem["pId"]] = {
                 "userId": elem["userId"], 
                 "familyName": elem["familyName"],
                 "firstName": elem["firstName"],
-                "data": elem["date"],
+                "date": elem["date"].substring(0, elem["date"].indexOf(" ")),
             }
         }
-        // グレースケール化の関数を画像ロード時に実行
-        for (const key in portionData) {
+        // 抽選部の設定
+        for (const key in portionInfo) {
             const img = document.getElementById(key);
+            // グレースケール化の関数を画像ロード時に実行
             img.onload = function() {
                 if (!img.classList.contains("gray")) {
                     fillGray(img);
                     img.setAttribute("class", "gray")
                 }
             }
+            // ツールチップの準備
+            img.setAttribute("data-bs-toggle", "tooltip");
+            img.setAttribute("data-bs-html", "true");
+            text = createText(key);
+            img.setAttribute("data-bs-original-title", text);
         }
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
     }
     callApi();
 }
@@ -67,4 +84,13 @@ function fillGray(img) {
 
     url = canvas.toDataURL();
     img.src = url;
+}
+
+function createText(id) {
+    portion = portionInfo[id]
+    const userId = portion["userId"]
+    const name = portion["familyName"] + portion["firstName"]
+    const date = portion["date"]
+    const text = `<p>---- 所有者情報 ----</p><p>ユーザID：${userId}<br>姓名：${name}<br>抽選日：${date}</p>`
+    return text;
 }

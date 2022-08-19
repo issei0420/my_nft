@@ -68,6 +68,5 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(b)
-	fmt.Printf("b: %s\n", b)
 	images = nil
 }
