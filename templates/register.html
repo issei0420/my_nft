@@ -5,37 +5,37 @@
     </div>
 
     {{ if .Form }}
-    <form action="/register" method="post">
+    <form action="/register" method="post" id="form">
         <label for="" class="form-label mt-3">姓名</label>
         <div class="input-group  mb-3">
-          <input type="text" aria-label="Last name" class="form-control" id="lastNameInput" name="familyName" value="{{ index .Form.familyName 0 }}">
-          <input type="text" aria-label="First name" class="form-control" id="firsNameInput" name="firstName" value="{{ index .Form.firstName 0 }}">
+          <input type="text" aria-label="Last name" class="required form-control" id="lastNameInput" name="familyName" value="{{ index .Form.familyName 0 }}">
+          <input type="text" aria-label="First name" class="required form-control" id="firsNameInput" name="firstName" value="{{ index .Form.firstName 0 }}">
         </div>
         <div class="mb-3">
           <label for="inputNickname" class="form-label">ニックネーム</label>
-          <input type="" class="form-control" id="inputNickname" name="nickname" value="{{ index .Form.nickname 0 }}">
+          <input type="" class="required form-control" id="inputNickname" name="nickname" value="{{ index .Form.nickname 0 }}">
           {{ if eq .ResMap.nickname 0 }}
           <p class="text-danger">このニックネームはすでに登録されています</p>
           {{ end }}
         </div>
         <div class="mb-3">
             <label for="inputMail" class="form-label">メールアドレス</label>
-            <input type="mail" class="form-control" id="inputMail" name="mail" value="{{ index .Form.mail 0 }}">
+            <input type="mail" class="required form-control" id="inputMail" name="mail" value="{{ index .Form.mail 0 }}">
             {{ if eq .ResMap.mail 0 }}
             <p class="text-danger">このメールアドレスはすでに登録されています</p>
             {{ end }}
           </div>
           <div class="mb-3">
             <label for="inputCompany" class="form-label">会社名</label>
-            <input type="" class="form-control" id="inputCompany" name="company" value="{{ index .Form.company 0 }}">
+            <input type="" class="required form-control" id="inputCompany" name="company" value="{{ index .Form.company 0 }}">
           </div>
           <div class="mb-3">
             <label for="inputPassword" class="form-label">パスワード (保存後は確認できません）</label>
-            <input type="" class="form-control" id="inputPassword" name="password" value="{{ index .Form.password 0 }}">
+            <input type="" class="required form-control" id="inputPassword" name="password" value="{{ index .Form.password 0 }}">
           </div>
           <div class="mb-3">
             <label for="selectUserType" class="form-label">権限</label>
-            <select class="form-select" aria-label="Default select example" id="selectUserType" name="table">
+            <select class="required form-select" aria-label="Default select example" id="selectUserType" name="table">
                 <option>未選択</option>
                 {{ $t := index .Form.table 0}}
                 {{ if eq $t "consumers"}}
@@ -49,7 +49,7 @@
           </div>
           <div class="mb-3">
             <label for="inputLotteryUnits" class="form-label">抽選口数</label>
-            <input class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ index .Form.lotteryUnits 0 }}">
+            <input disabled class="required form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ index .Form.lotteryUnits 0 }}">
           </div>
         <div class="text-center">
           <button type="submit" class="btn btn-primary">保存</button>
@@ -57,39 +57,42 @@
     </form>
     
     {{ else }}
-    <form action="/register" method="post">
+    <form action="/register" method="post" id="form">
       <label for="" class="form-label mt-3">姓名</label>
       <div class="input-group  mb-3">
-        <input type="text" aria-label="Last name" class="form-control" id="lastNameInput" name="familyName">
-        <input type="text" aria-label="First name" class="form-control" id="firsNameInput" name="firstName">
+        <input type="text" aria-label="Last name" class="required form-control" id="lastNameInput" name="familyName">
+        <input type="text" aria-label="First name" class="required form-control" id="firsNameInput" name="firstName">
       </div>
       <div class="mb-3">
         <label for="inputNickname" class="form-label">ニックネーム</label>
-        <input type="" class="form-control" id="inputNickname" name="nickname">
+        <input type="" class="required form-control" id="inputNickname" name="nickname">
       </div>
       <div class="mb-3">
           <label for="inputMail" class="form-label">メールアドレス</label>
-          <input type="mail" class="form-control" id="inputMail" name="mail">
+          <input type="mail" class="required form-control" id="inputMail" name="mail">
         </div>
         <div class="mb-3">
           <label for="inputCompany" class="form-label">会社名</label>
-          <input type="" class="form-control" id="inputCompany" name="company">
+          <input type="" class="required form-control" id="inputCompany" name="company">
         </div>
         <div class="mb-3">
           <label for="inputPassword" class="form-label">パスワード (保存後は確認できません）</label>
-          <input type="" class="form-control" id="inputPassword" name="password">
+          <input type="" class="required form-control" id="inputPassword" name="password">
         </div>
         <div class="mb-3">
           <label for="selectUserType" class="form-label">権限</label>
-          <select class="form-select" aria-label="Default select example" id="selectUserType" name="table">
-              <option>未選択</option>
+          <select class="required form-select" aria-label="Default select example" id="selectUserType" name="table">
+              <option selected disabled value="">未選択</option>
               <option value="consumers">利用者</option>
               <option value="sellers">出品者</option>
+              <div class="">
+                権限を選択してください
+              </div>
           </select>
         </div>
         <div class="mb-3">
-          <label for="inputLotteryUnits" class="form-label">抽選口数</label>
-          <input class="form-control" id="inputLotteryUnits" name="lotteryUnits">
+          <label disabled for="inputLotteryUnits" class="form-label">抽選口数</label>
+          <input class="required form-control" id="inputLotteryUnits" name="lotteryUnits">
         </div>
       <div class="text-center">
         <button type="submit" class="btn btn-primary">保存</button>
@@ -97,5 +100,5 @@
   </form>
   {{ end }}
   </div>
-
+  <script src="/static/js/validate.js"></script>
 {{ template "footer" .}}
