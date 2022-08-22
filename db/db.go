@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
+	"net/url"
 	"os"
 
 	"crypto/sha512"
@@ -38,74 +38,53 @@ func ConnectDb() {
 	fmt.Println("Database Connected!")
 }
 
-func RegisterDb(r *http.Request) ([]string, error) {
-
-	if err := r.ParseForm(); err != nil {
-		return nil, fmt.Errorf("RegisterDB: %v", err)
-	}
-	fv := map[string]string{} // Form Values
-	for k, v := range r.PostForm {
+func RegisterDb(form url.Values) error {
+	// Form Values
+	fv := map[string]string{}
+	for k, v := range form {
 		fv[k] = v[0]
 	}
-
+	// encoded password
 	pbyte := []byte(fv["password"])
 	pHash := sha512.Sum512(pbyte)
 	xpHash := fmt.Sprintf("%x", pHash)
-
-	if fv["userType"] == "出品者" {
-
-		evls, err := isExist("sellers", []string{"nickname", "mail"}, []string{fv["nickname"], fv["mail"]})
-		if err != nil {
-			return evls, fmt.Errorf("RegisterDB: %v", err)
-		}
-		if len(evls) >= 1 {
-			return evls, nil
-		}
-
-		_, err = db.Exec("INSERT INTO sellers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
+	// Sellers
+	if fv["table"] == "sellers" {
+		_, err := db.Exec("INSERT INTO sellers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
 			fv["familyName"], fv["firstName"], fv["nickname"], fv["company"], fv["mail"], xpHash)
 		if err != nil {
-			return evls, fmt.Errorf("RegisterDB: %v", err)
+			return fmt.Errorf("RegisterDB: %v", err)
 		}
-		return evls, nil
-
-	} else {
-
-		evls, err := isExist("consumers", []string{"nickname", "mail"}, []string{fv["nickname"], fv["mail"]})
-		if err != nil {
-			return evls, fmt.Errorf("RegisterDB: %v", err)
-		}
-		if len(evls) >= 1 {
-			fmt.Println("len(evls)")
-			return evls, nil
-		}
-
-		_, err = db.Exec("INSERT INTO consumers (family_name, first_name, nickname, company, lottery_units, mail, password) VALUES(?, ?, ?, ?, ?, ?, ?)",
+		return nil
+		// Consumers
+	} else if fv["table"] == "consumers" {
+		_, err := db.Exec("INSERT INTO consumers (family_name, first_name, nickname, company, lottery_units, mail, password) VALUES(?, ?, ?, ?, ?, ?, ?)",
 			fv["familyName"], fv["firstName"], fv["nickname"], fv["company"], fv["lotteryUnits"], fv["mail"], xpHash)
 		if err != nil {
-			return evls, fmt.Errorf("RegisterDB: %v", err)
+			return fmt.Errorf("RegisterDB: %v", err)
 		}
-		return evls, nil
+		return nil
+	} else {
+		return fmt.Errorf("RegisterDb: no such table %s", fv["table"])
 	}
 }
 
-func isExist(t string, cls []string, vls []string) ([]string, error) {
-	var d int
-	var evls []string // Exist Values
-	for i, c := range cls {
-		sq := fmt.Sprintf("SELECT id from %s where %s = ?", t, c)
-		row := db.QueryRow(sq, vls[i])
-		if err := row.Scan(&d); err != nil {
+func UniqueCheck(table string, UKMap map[string]string) (map[string]int, error) {
+	var id int
+	resMap := make(map[string]int)
+	for k, v := range UKMap {
+		query := fmt.Sprintf("SELECT id FROM %s WHERE %s = ?", table, k)
+		row := db.QueryRow(query, v)
+		if err := row.Scan(&id); err != nil {
 			if err == sql.ErrNoRows {
-
-			} else {
-				return evls, fmt.Errorf("isExist: %v", err)
+				resMap[k] = 1 // is unique
+				continue
 			}
-		} else {
-			evls = append(evls, vls[i])
+			return resMap, fmt.Errorf("UniqueCheck: %v", err)
 		}
+		resMap[k] = 0 // not unique
 	}
-	return evls, nil
+	return resMap, nil
 }
 
 type Consumers struct {

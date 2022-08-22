@@ -20,7 +20,7 @@ func main() {
 	http.HandleFunc("/admin/login", handler.AdminLoginHandler) // admin
 	http.HandleFunc("/logout", handler.LogoutHandler)
 	http.HandleFunc("/usrList", handler.UsrListHandler)
-	http.HandleFunc("/register", handler.Register())
+	http.HandleFunc("/register", handler.RegisterHandler)
 	http.HandleFunc("/upload", handler.UploadHandler)
 	http.HandleFunc("/imgList", handler.ImgListHandler)
 	http.HandleFunc("/image", handler.ImageHandler)

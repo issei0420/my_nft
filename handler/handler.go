@@ -7,11 +7,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"nft-site/db"
 	"nft-site/lib"
 	"nft-site/view"
 	"os"
-	"text/template"
 
 	"github.com/gorilla/sessions"
 )
@@ -216,34 +216,62 @@ func UsrListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Register() func(w http.ResponseWriter, r *http.Request) {
-	var tf *template.Template
-	hh := func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			evls, err := db.RegisterDb(r)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if len(evls) > 1 {
-				fmt.Println(evls)
-				fmt.Println("すでに存在する値です")
-				tf = view.Page("register")
-				err := tf.Execute(w, nil)
-				if err != nil {
-					log.Fatal(err)
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	sessionManager(w, r, "admin")
+
+	type Item struct {
+		UserType string
+		ResMap   map[string]int
+		Form     url.Values
+	}
+
+	if err := view.AdminParse(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if r.Method == "POST" {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// ユニーク制限のある項目の値に重複がないかチェック
+		UKMap := map[string]string{"mail": r.Form["mail"][0], "nickname": r.Form["nickname"][0]}
+		resMap, err := db.UniqueCheck(r.Form["table"][0], UKMap)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		for _, v := range resMap {
+			if v == 0 {
+				item := Item{
+					UserType: "admin",
+					ResMap:   resMap,
+					Form:     r.Form,
 				}
-			} else {
-				http.Redirect(w, r, "/usrList", http.StatusFound)
-			}
-		} else {
-			tf = view.Page("register")
-			err := tf.Execute(w, nil)
-			if err != nil {
-				log.Fatal(err)
+				err := view.AdminTemps.ExecuteTemplate(w, "register.html", item)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				return
 			}
 		}
+
+		// 会員情報の登録
+		if err := db.RegisterDb(r.Form); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/usrList", http.StatusFound)
+	} else {
+		item := Item{UserType: "admin", Form: nil}
+		err := view.AdminTemps.ExecuteTemplate(w, "register.html", item)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
-	return hh
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
