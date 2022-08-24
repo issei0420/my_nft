@@ -16,7 +16,7 @@ var SellerTemps *template.Template
 func AdminParse() error {
 	tmps, err := template.ParseFiles("templates/header.html", "templates/footer.html",
 		"templates/image.html", "templates/imgList.html", "templates/register.html",
-		"templates/upload.html", "templates/usrList.html")
+		"templates/edit.html", "templates/upload.html", "templates/usrList.html")
 	if err != nil {
 		return fmt.Errorf("AdminRender: %v", err)
 	}

@@ -87,25 +87,39 @@ func UniqueCheck(table string, UKMap map[string]string) (map[string]int, error) 
 	return resMap, nil
 }
 
-type Consumers struct {
-	FamilyName string
-	FirstName  string
-	Nickname   string
-	Mail       string
-	Company    string
-	// haveNum    int
+type Consumer struct {
+	Id           int
+	FamilyName   string
+	FirstName    string
+	Nickname     string
+	Mail         string
+	Company      string
+	LotteryUnits string
 }
 
-func GetAllConsumers() ([]Consumers, error) {
-	var cons []Consumers
-	rows, err := db.Query("SELECT family_name, first_name, nickname, mail, company FROM consumers")
+func GetConsumerFromId(id string) (Consumer, error) {
+	var c Consumer
+	row := db.QueryRow("SELECT family_name, first_name, nickname, mail, company, lottery_units FROM consumers where id = ?", id)
+	err := row.Scan(&c.FamilyName, &c.FirstName, &c.Nickname, &c.Mail, &c.Company, &c.LotteryUnits)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c, fmt.Errorf("GetConsumerFromId %s: No such consumer", id)
+		}
+		return c, fmt.Errorf("GetConsumerFromId %s: %v", id, err)
+	}
+	return c, nil
+}
+
+func GetAllConsumers() ([]Consumer, error) {
+	var cons []Consumer
+	rows, err := db.Query("SELECT id, family_name, first_name, nickname, mail, company FROM consumers")
 	if err != nil {
 		return cons, fmt.Errorf("getAllConsumers: %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var con Consumers
-		if err := rows.Scan(&con.FamilyName, &con.FirstName, &con.Nickname, &con.Mail, &con.Company); err != nil {
+		var con Consumer
+		if err := rows.Scan(&con.Id, &con.FamilyName, &con.FirstName, &con.Nickname, &con.Mail, &con.Company); err != nil {
 			return nil, fmt.Errorf("getAllConsumers: %v", err)
 		}
 		cons = append(cons, con)
@@ -116,7 +130,8 @@ func GetAllConsumers() ([]Consumers, error) {
 	return cons, nil
 }
 
-type Sellers struct {
+type Seller struct {
+	Id         int
 	FamilyName string
 	FirstName  string
 	Nickname   string
@@ -124,16 +139,16 @@ type Sellers struct {
 	Company    string
 }
 
-func GetAllSellers() ([]Sellers, error) {
-	var slrs []Sellers
-	rows, err := db.Query("SELECT family_name, first_name, nickname, mail, company FROM sellers")
+func GetAllSellers() ([]Seller, error) {
+	var slrs []Seller
+	rows, err := db.Query("SELECT id, family_name, first_name, nickname, mail, company FROM sellers")
 	if err != nil {
 		return slrs, fmt.Errorf("getAllSellers: %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var slr Sellers
-		if err := rows.Scan(&slr.FamilyName, &slr.FirstName, &slr.Nickname, &slr.Mail, &slr.Company); err != nil {
+		var slr Seller
+		if err := rows.Scan(&slr.Id, &slr.FamilyName, &slr.FirstName, &slr.Nickname, &slr.Mail, &slr.Company); err != nil {
 			return nil, fmt.Errorf("getAllSellers: %v", err)
 		}
 		slrs = append(slrs, slr)
@@ -144,12 +159,25 @@ func GetAllSellers() ([]Sellers, error) {
 	return slrs, nil
 }
 
-func GetPassword(t string, mail string) (string, error) {
+func GetSellerFromId(id string) (Seller, error) {
+	var s Seller
+	row := db.QueryRow("SELECT family_name, first_name, nickname, mail, company FROM sellers where id = ?", id)
+	err := row.Scan(&s.FamilyName, &s.FirstName, &s.Nickname, &s.Mail, &s.Company)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return s, fmt.Errorf("GetSellerFromId %s: No such seller", id)
+		}
+		return s, fmt.Errorf("GetSellerFromId %s: %v", id, err)
+	}
+	return s, nil
+}
+
+func GetPassword(table, mail string) (string, error) {
 	var p string
-	sq := fmt.Sprintf("SELECT password from %s where mail = ?", t)
+	sq := fmt.Sprintf("SELECT password from %s where mail = ?", table)
 	row := db.QueryRow(sq, mail)
 	if err := row.Scan(&p); err != nil {
-		return "", err
+		return "", fmt.Errorf("GetPassword: %v", err)
 	}
 	return p, nil
 }

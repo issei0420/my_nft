@@ -193,8 +193,8 @@ func UsrListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type Item struct {
-		Consumers []db.Consumers
-		Sellers   []db.Sellers
+		Consumers []db.Consumer
+		Sellers   []db.Seller
 		UserType  string
 	}
 
@@ -267,6 +267,61 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		item := Item{UserType: "admin", Form: nil}
 		err := view.AdminTemps.ExecuteTemplate(w, "register.html", item)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func EditHandler(w http.ResponseWriter, r *http.Request) {
+	type Item struct {
+		User     interface{}
+		ResMap   map[string]int
+		UserType string
+		Form     url.Values
+	}
+
+	if r.Method == "POST" {
+
+	} else {
+		sessionManager(w, r, "admin")
+		utype := r.FormValue("utype")
+		id := r.FormValue("id")
+
+		var user interface{}
+		if utype == "consumer" {
+			var c db.Consumer
+			c, err := db.GetConsumerFromId(id)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			user = c
+		} else {
+			var s db.Seller
+			s, err := db.GetSellerFromId(id)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			user = s
+		}
+
+		item := struct {
+			User     interface{}
+			UserType string
+			Form     string
+			Utype    string
+		}{
+			User:     user,
+			UserType: "admin",
+			Form:     "",
+			Utype:    utype,
+		}
+
+		err := view.AdminTemps.ExecuteTemplate(w, "edit.html", item)
+		fmt.Printf("user: %v", user)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
