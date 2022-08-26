@@ -3,9 +3,8 @@
     <div class="register text-center fs-5">
       <span class="border-bottom border-secondary border-1 p-1">新規登録</span>
     </div>
-
     {{ if .Form }}
-    <form action="/register" method="post" id="form">
+    <form action="/edit" method="post" id="form">
         <label for="" class="form-label mt-3">姓名</label>
         <div class="input-group  mb-3">
           <input type="text" aria-label="Last name" class="required form-control" id="lastNameInput" name="familyName" value="{{ index .Form.familyName 0 }}">
@@ -57,33 +56,41 @@
     </form>
     
     {{ else }}
-    <form action="/register" method="post" id="form">
+
+      {{ $user := "" }}
+      {{ if .IsConsumer}}
+        {{ $user = .User.Consumer }}
+      {{ else }}
+        {{ $user = .User.Seller }}
+      {{ end }}
+    <form action="/edit" method="post" id="form">
+      <input type="hidden" value="{{ $user.Id }}" name="id">
       <label for="" class="form-label mt-3">姓名</label>
       <div class="input-group  mb-3">
-        <input type="text" aria-label="Last name" class="required form-control" id="lastNameInput" name="familyName" value="{{ .User.FamilyName }}">
-        <input type="text" aria-label="First name" class="required form-control" id="firsNameInput" name="firstName" value="{{ .User.FirstName }}">
+        <input type="text" aria-label="Last name" class="required form-control" id="lastNameInput" name="familyName" value="{{ $user.FamilyName }}">
+        <input type="text" aria-label="First name" class="required form-control" id="firsNameInput" name="firstName" value="{{ $user.FirstName }}">
       </div>
       <div class="mb-3">
         <label for="inputNickname" class="form-label">ニックネーム</label>
-        <input type="" class="required form-control" id="inputNickname" name="nickname" value="{{ .User.Nickname }}">
+        <input type="" class="required form-control" id="inputNickname" name="nickname" value="{{ $user.Nickname }}">
       </div>
       <div class="mb-3">
           <label for="inputMail" class="form-label">メールアドレス</label>
-          <input type="mail" class="required form-control" id="inputMail" name="mail" value="{{ .User.Mail }}">
+          <input type="mail" class="required form-control" id="inputMail" name="mail" value="{{ $user.Mail }}">
         </div>
         <div class="mb-3">
           <label for="inputCompany" class="form-label">会社名</label>
-          <input type="" class="required form-control" id="inputCompany" name="company" value="{{ .User.Company }}">
+          <input type="" class="required form-control" id="inputCompany" name="company" value="{{ $user.Company }}">
         </div>
         <div class="mb-3">
           <label for="inputPassword" class="form-label">パスワード</label>
-          <input type="" class="required form-control" id="inputPassword" name="password" value="******">
+          <input type="" class="required form-control" id="inputPassword" invalid><button>変更</button>
         </div>
         <div class="mb-3">
           <label for="selectUserType" class="form-label">権限</label>
           <select class="required form-select" aria-label="Default select example" id="selectUserType" name="table">
               <option selected disabled value="">未選択</option>
-              {{ if eq .Utype "consumer" }}
+              {{ if .IsConsumer }}
               <option value="consumers" selected>利用者</option>
               <option value="sellers">出品者</option>
               {{ else }}
@@ -94,17 +101,17 @@
         </div>
         <div class="mb-3">
           <label disabled for="inputLotteryUnits" class="form-label">抽選口数</label>
-          {{ if eq .Utype "consumer" }}
-          <input class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ .User.LotteryUnits}}">
+          {{ if .IsConsumer }}
+          <input class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ $user.LotteryUnits}}">
           {{ else }}
           <input class="form-control" id="inputLotteryUnits" name="lotteryUnits" disabled>
           {{ end }}
         </div>
       <div class="text-center">
-        <button type="submit" class="btn btn-primary">保存</button>
+        <button type="submit" class="btn btn-primary" id="submit">保存</button>
       </div>
   </form>
   {{ end }}
   </div>
-  <script src="/static/js/validate.js"></script>
+  <script src="/static/js/edit.js"></script>
 {{ template "footer" .}}

@@ -242,6 +242,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// 重複があればリダイレクト
 		for _, v := range resMap {
 			if v == 0 {
 				item := Item{
@@ -275,21 +276,54 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditHandler(w http.ResponseWriter, r *http.Request) {
-	type Item struct {
-		User     interface{}
-		ResMap   map[string]int
-		UserType string
-		Form     url.Values
-	}
-
 	if r.Method == "POST" {
+
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		fmt.Printf("yaunTable: %v\n", r.Form["yaunTable"][0])
+		fmt.Printf("table: %v\n", r.Form["table"][0])
+		var u db.User
+		if r.Form["yaunTable"][0] == "consumers" {
+			var c db.Consumer
+			c, err := db.GetConsumerFromId(r.Form["id"][0])
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			u = db.User{
+				Consumer: c,
+			}
+		} else {
+			var s db.Seller
+			s, err := db.GetSellerFromId(r.Form["id"][0])
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			u = db.User{
+				Seller: s,
+			}
+		}
+
+		diffMap := lib.CheckDiff(u, r.Form)
+		var err error
+		if r.Form["table"][0] == "consumers" {
+			err = db.UpdateConsumer(diffMap, r.Form["id"][0])
+		} else {
+			err = db.UpdateConsumer(diffMap, r.Form["id"][0])
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
 	} else {
 		sessionManager(w, r, "admin")
 		utype := r.FormValue("utype")
 		id := r.FormValue("id")
 
-		var user interface{}
+		var u db.User
 		if utype == "consumer" {
 			var c db.Consumer
 			c, err := db.GetConsumerFromId(id)
@@ -297,7 +331,7 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			user = c
+			u.Consumer = c
 		} else {
 			var s db.Seller
 			s, err := db.GetSellerFromId(id)
@@ -305,23 +339,29 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			user = s
+			u.Seller = s
+		}
+
+		var ic bool
+		if u.Consumer.Id != 0 {
+			ic = true
+		} else {
+			ic = false
 		}
 
 		item := struct {
-			User     interface{}
-			UserType string
-			Form     string
-			Utype    string
+			User       db.User
+			UserType   string
+			Form       string
+			IsConsumer bool
 		}{
-			User:     user,
-			UserType: "admin",
-			Form:     "",
-			Utype:    utype,
+			User:       u,
+			UserType:   "admin",
+			Form:       "",
+			IsConsumer: ic,
 		}
 
 		err := view.AdminTemps.ExecuteTemplate(w, "edit.html", item)
-		fmt.Printf("user: %v", user)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

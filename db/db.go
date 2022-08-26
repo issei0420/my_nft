@@ -97,10 +97,24 @@ type Consumer struct {
 	LotteryUnits string
 }
 
+type Seller struct {
+	Id         int
+	FamilyName string
+	FirstName  string
+	Nickname   string
+	Mail       string
+	Company    string
+}
+
+type User struct {
+	Consumer
+	Seller
+}
+
 func GetConsumerFromId(id string) (Consumer, error) {
 	var c Consumer
-	row := db.QueryRow("SELECT family_name, first_name, nickname, mail, company, lottery_units FROM consumers where id = ?", id)
-	err := row.Scan(&c.FamilyName, &c.FirstName, &c.Nickname, &c.Mail, &c.Company, &c.LotteryUnits)
+	row := db.QueryRow("SELECT id, family_name, first_name, nickname, mail, company, lottery_units FROM consumers where id = ?", id)
+	err := row.Scan(&c.Id, &c.FamilyName, &c.FirstName, &c.Nickname, &c.Mail, &c.Company, &c.LotteryUnits)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return c, fmt.Errorf("GetConsumerFromId %s: No such consumer", id)
@@ -130,13 +144,18 @@ func GetAllConsumers() ([]Consumer, error) {
 	return cons, nil
 }
 
-type Seller struct {
-	Id         int
-	FamilyName string
-	FirstName  string
-	Nickname   string
-	Mail       string
-	Company    string
+func UpdateConsumer(diffMap map[string]string, id string) error {
+	st := ""
+	for k, v := range diffMap {
+		st += fmt.Sprintf(" %s = \"%s\",", k, v)
+	}
+	st = st[:len(st)-1]
+	sq := fmt.Sprintf("UPDATE consumers SET %s WHERE id = ?", st)
+	_, err := db.Exec(sq, id)
+	if err != nil {
+		return fmt.Errorf("UpdateConsumer: %v", err)
+	}
+	return nil
 }
 
 func GetAllSellers() ([]Seller, error) {
@@ -161,8 +180,8 @@ func GetAllSellers() ([]Seller, error) {
 
 func GetSellerFromId(id string) (Seller, error) {
 	var s Seller
-	row := db.QueryRow("SELECT family_name, first_name, nickname, mail, company FROM sellers where id = ?", id)
-	err := row.Scan(&s.FamilyName, &s.FirstName, &s.Nickname, &s.Mail, &s.Company)
+	row := db.QueryRow("SELECT id, family_name, first_name, nickname, mail, company FROM sellers where id = ?", id)
+	err := row.Scan(&s.Id, &s.FamilyName, &s.FirstName, &s.Nickname, &s.Mail, &s.Company)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return s, fmt.Errorf("GetSellerFromId %s: No such seller", id)
