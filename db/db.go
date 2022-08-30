@@ -95,6 +95,7 @@ type Consumer struct {
 	Mail         string
 	Company      string
 	LotteryUnits string
+	ImgNum       string
 }
 
 type Seller struct {
@@ -126,14 +127,16 @@ func GetConsumerFromId(id string) (Consumer, error) {
 
 func GetAllConsumers() ([]Consumer, error) {
 	var cons []Consumer
-	rows, err := db.Query("SELECT id, family_name, first_name, nickname, mail, company FROM consumers")
+	rows, err := db.Query("select c.id, c.family_name, c.first_name, c.nickname, c.mail, c.company, c.lottery_units, count(portion) " +
+		"from lottery l right join consumers c on l.consumer_id = c.id " +
+		"left join portion p on l.id = p.lottery_id group by c.id")
 	if err != nil {
 		return cons, fmt.Errorf("getAllConsumers: %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var con Consumer
-		if err := rows.Scan(&con.Id, &con.FamilyName, &con.FirstName, &con.Nickname, &con.Mail, &con.Company); err != nil {
+		if err := rows.Scan(&con.Id, &con.FamilyName, &con.FirstName, &con.Nickname, &con.Mail, &con.Company, &con.LotteryUnits, &con.ImgNum); err != nil {
 			return nil, fmt.Errorf("getAllConsumers: %v", err)
 		}
 		cons = append(cons, con)
@@ -437,3 +440,16 @@ func GetSoldPortions(fn string) ([]Portion, error) {
 	}
 	return portions, nil
 }
+
+// func GetImgNum(id string) (int, error) {
+// 	row := db.QueryRow("SELECT COUNT(portion) FROM lottery l INNER JOIN portion p ON l.id = p.lottery_id "+
+// 		"INNER JOIN consumers c ON l.consumer_id = c.id WHERE id = ?", id)
+// 	var n int
+// 	if err := row.Scan(&n); err != nil {
+// 		if err == sql.ErrNoRows {
+// 			return 0, fmt.Errorf("GetImgNum: No such consumer %d\n", n)
+// 		}
+// 		return 0, fmt.Errorf("GetImgNum: %v\n", err)
+// 	}
+// 	return n, nil
+// }

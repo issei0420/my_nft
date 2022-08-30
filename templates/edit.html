@@ -103,7 +103,7 @@
         <div class="mb-3">
           <label disabled for="inputLotteryUnits" class="form-label">抽選口数</label>
           {{ if .IsConsumer }}
-          <input placeholder="半角数字で入力" class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ $user.LotteryUnits}}">
+          <input placeholder="半角数字で入力" class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ $user.LotteryUnits }}">
           {{ else }}
           <input class="form-control" id="inputLotteryUnits" name="lotteryUnits" disabled>
           {{ end }}

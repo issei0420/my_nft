@@ -20,7 +20,7 @@ func CheckDiff(u db.User, form url.Values) map[string]string {
 func setDiffMap(diffMap map[string]string, form url.Values, user interface{}) map[string]string {
 	rtUser := reflect.TypeOf(user)
 	rvUser := reflect.ValueOf(user)
-	for i := 1; i < rtUser.NumField(); i++ {
+	for i := 1; i < rtUser.NumField()-1; i++ {
 		name := rtUser.Field(i).Name
 		key := titleLower(name)
 		value := rvUser.FieldByName(name).Interface()
