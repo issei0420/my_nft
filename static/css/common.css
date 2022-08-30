@@ -6,6 +6,13 @@ body {
 .contents {
     margin: 0 5rem !important;
 }
+#register-btn {
+    background-color: #f88901 !important;
+    color: white;
+}
+#register-btn:hover {
+    background-color: #ea8406 !important;
+}
 
 /* register */
 .container {

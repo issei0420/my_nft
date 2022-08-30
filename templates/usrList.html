@@ -4,7 +4,7 @@
           <span class="border-bottom border-secondary border-1 p-1">会員一覧</span>
         </div>
         <div class="text-end">
-          <a href="/register" class="btn-secondary btn" role="button" id="test">新規登録</a>
+          <a id="register-btn" href="/register" class="btn" role="button" id="test">新規登録</a>
         </div>
         <table class="table mb-5">
             <thead>
@@ -28,7 +28,11 @@
                 <td>{{ .Mail }}</td>
                 <td>{{ .Company }}</td>
                 <td>{{ .ImgNum }}</td>
-                <td><a href="/edit?utype=consumer&id={{ .Id }}" class="btn btn-secondary btn-sm editButton consumer" role="button">編集</a></td>
+                <td>
+                  <a href="/edit?utype=consumer&id={{ .Id }}" class="editButton consumer" role="button">
+                    <i class="bi bi-pencil-square fs-5"></i>
+                  </a>
+                </td>
               </tr>
               {{ end }}
             </tbody>
@@ -53,7 +57,10 @@
                 <td>{{ .Nickname }}</td>
                 <td>{{ .Mail }}</td>
                 <td>{{ .Company }}</td>
-                <td><a href="/edit?utype=seller&id={{ .Id }}" class="btn btn-secondary btn-sm editButton seller" role="button">編集</a></td>
+                <td>
+                  <a href="/edit?utype=seller&id={{ .Id }}" class="editButton seller" role="button">
+                    <i class="bi bi-pencil-square fs-5"></i>
+                  </a></td>
               </tr>
               {{ end }}
             </tbody>
