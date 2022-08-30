@@ -5,6 +5,7 @@
     </div>
     {{ if .Form }}
     <form action="/edit" method="post" id="form">
+        <input type="hidden" value="{{ index .Form.id 0 }}" name="id">
         <label for="" class="form-label mt-3">姓名</label>
         <div class="input-group  mb-3">
           <input type="text" aria-label="Last name" class="required form-control" id="lastNameInput" name="familyName" value="{{ index .Form.familyName 0 }}">
@@ -19,7 +20,7 @@
         </div>
         <div class="mb-3">
             <label for="inputMail" class="form-label">メールアドレス</label>
-            <input type="mail" class="required form-control" id="inputMail" name="mail" value="{{ index .Form.mail 0 }}">
+            <input type="email" class="required form-control" id="inputMail" name="mail" value="{{ index .Form.mail 0 }}">
             {{ if eq .ResMap.mail 0 }}
             <p class="text-danger">このメールアドレスはすでに登録されています</p>
             {{ end }}
@@ -29,8 +30,8 @@
             <input type="" class="required form-control" id="inputCompany" name="company" value="{{ index .Form.company 0 }}">
           </div>
           <div class="mb-3">
-            <label for="inputPassword" class="form-label">パスワード (保存後は確認できません）</label>
-            <input type="" class="required form-control" id="inputPassword" name="password" value="{{ index .Form.password 0 }}">
+            <label for="inputPassword" class="form-label">パスワード</label>
+            <input class="form-control" id="inputPassword" disabled><button>変更</button>
           </div>
           <div class="mb-3">
             <label for="selectUserType" class="form-label">権限</label>
@@ -48,7 +49,7 @@
           </div>
           <div class="mb-3">
             <label for="inputLotteryUnits" class="form-label">抽選口数</label>
-            <input disabled class="required form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ index .Form.lotteryUnits 0 }}">
+            <input class="required form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ index .Form.lotteryUnits 0 }}">
           </div>
         <div class="text-center">
           <button type="submit" class="btn btn-primary">保存</button>
@@ -76,7 +77,7 @@
       </div>
       <div class="mb-3">
           <label for="inputMail" class="form-label">メールアドレス</label>
-          <input type="mail" class="required form-control" id="inputMail" name="mail" value="{{ $user.Mail }}">
+          <input type="email" class="required form-control" id="inputMail" name="mail" value="{{ $user.Mail }}">
         </div>
         <div class="mb-3">
           <label for="inputCompany" class="form-label">会社名</label>
@@ -84,17 +85,17 @@
         </div>
         <div class="mb-3">
           <label for="inputPassword" class="form-label">パスワード</label>
-          <input type="" class="required form-control" id="inputPassword" invalid><button>変更</button>
+          <input class="form-control" id="inputPassword" disabled><button>変更</button>
         </div>
         <div class="mb-3">
           <label for="selectUserType" class="form-label">権限</label>
           <select class="required form-select" aria-label="Default select example" id="selectUserType" name="table">
-              <option selected disabled value="">未選択</option>
+              <!-- <option selected disabled value="">未選択</option> -->
               {{ if .IsConsumer }}
               <option value="consumers" selected>利用者</option>
-              <option value="sellers">出品者</option>
+              <!-- <option value="sellers">出品者</option> -->
               {{ else }}
-              <option value="consumers">利用者</option>
+              <!-- <option value="consumers">利用者</option> -->
               <option value="sellers" selected>出品者</option>
               {{ end }}
           </select>
@@ -102,7 +103,7 @@
         <div class="mb-3">
           <label disabled for="inputLotteryUnits" class="form-label">抽選口数</label>
           {{ if .IsConsumer }}
-          <input class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ $user.LotteryUnits}}">
+          <input placeholder="半角数字で入力" class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ $user.LotteryUnits}}">
           {{ else }}
           <input class="form-control" id="inputLotteryUnits" name="lotteryUnits" disabled>
           {{ end }}
@@ -113,5 +114,6 @@
   </form>
   {{ end }}
   </div>
+    <script src="/static/js/validate.js"></script>
   <script src="/static/js/edit.js"></script>
 {{ template "footer" .}}

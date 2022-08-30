@@ -1,5 +1,3 @@
-const selectUserType = document.getElementById("selectUserType")
-
 window.addEventListener("DOMContentLoaded", () => {
     const yaunValue = document.getElementById("selectUserType").value 
     initialize(yaunValue);

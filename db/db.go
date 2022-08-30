@@ -144,13 +144,13 @@ func GetAllConsumers() ([]Consumer, error) {
 	return cons, nil
 }
 
-func UpdateConsumer(diffMap map[string]string, id string) error {
+func UpdateUser(diffMap map[string]string, id, table string) error {
 	st := ""
 	for k, v := range diffMap {
 		st += fmt.Sprintf(" %s = \"%s\",", k, v)
 	}
 	st = st[:len(st)-1]
-	sq := fmt.Sprintf("UPDATE consumers SET %s WHERE id = ?", st)
+	sq := fmt.Sprintf("UPDATE %s SET %s WHERE id = ?", table, st)
 	_, err := db.Exec(sq, id)
 	if err != nil {
 		return fmt.Errorf("UpdateConsumer: %v", err)

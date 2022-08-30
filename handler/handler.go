@@ -282,8 +282,7 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		fmt.Printf("yaunTable: %v\n", r.Form["yaunTable"][0])
-		fmt.Printf("table: %v\n", r.Form["table"][0])
+
 		var u db.User
 		if r.Form["yaunTable"][0] == "consumers" {
 			var c db.Consumer
@@ -306,17 +305,58 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		// 重複チェック
 		diffMap := lib.CheckDiff(u, r.Form)
-		var err error
-		if r.Form["table"][0] == "consumers" {
-			err = db.UpdateConsumer(diffMap, r.Form["id"][0])
-		} else {
-			err = db.UpdateConsumer(diffMap, r.Form["id"][0])
+		UKMap := make(map[string]string)
+		if 1 <= len(diffMap) {
+			for k := range diffMap {
+				if k == "nickname" || k == "mail" {
+					UKMap[k] = diffMap[k]
+				}
+			}
 		}
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+
+		if 1 <= len(UKMap) {
+			resMap, err := db.UniqueCheck(r.Form["table"][0], UKMap)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			type Item struct {
+				UserType string
+				ResMap   map[string]int
+				Form     url.Values
+			}
+			// 重複があればリダイレクト
+			for _, v := range resMap {
+				if v == 0 {
+					item := Item{
+						UserType: "admin",
+						ResMap:   resMap,
+						Form:     r.Form,
+					}
+					err := view.AdminTemps.ExecuteTemplate(w, "edit.html", item)
+					if err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+					return
+				}
+			}
+
+			// update
+			if r.Form["table"][0] == "consumers" {
+				err = db.UpdateUser(diffMap, r.Form["id"][0], r.Form["table"][0])
+			} else {
+				err = db.UpdateUser(diffMap, r.Form["id"][0], r.Form["table"][0])
+			}
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
+
+		http.Redirect(w, r, "/usrList", http.StatusFound)
 
 	} else {
 		sessionManager(w, r, "admin")

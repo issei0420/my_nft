@@ -20,7 +20,7 @@
         </div>
         <div class="mb-3">
             <label for="inputMail" class="form-label">メールアドレス</label>
-            <input type="mail" class="required form-control" id="inputMail" name="mail" value="{{ index .Form.mail 0 }}">
+            <input type="email" class="required form-control" id="inputMail" name="mail" value="{{ index .Form.mail 0 }}">
             {{ if eq .ResMap.mail 0 }}
             <p class="text-danger">このメールアドレスはすでに登録されています</p>
             {{ end }}
@@ -69,7 +69,7 @@
       </div>
       <div class="mb-3">
           <label for="inputMail" class="form-label">メールアドレス</label>
-          <input type="mail" class="required form-control" id="inputMail" name="mail">
+          <input type="email" class="required form-control" id="inputMail" name="mail">
         </div>
         <div class="mb-3">
           <label for="inputCompany" class="form-label">会社名</label>
@@ -92,7 +92,7 @@
         </div>
         <div class="mb-3">
           <label disabled for="inputLotteryUnits" class="form-label">抽選口数</label>
-          <input class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="0">
+          <input id="lotteryUnits" class="form-control" id="inputLotteryUnits" name="lotteryUnits" placeholder="半角数字で入力">
         </div>
       <div class="text-center">
         <button type="submit" class="btn btn-primary">保存</button>
