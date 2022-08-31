@@ -518,9 +518,10 @@ func ImgListHandler(w http.ResponseWriter, r *http.Request) {
 		UserType: utype,
 		Images:   imgs,
 	}
-	err = view.SellerTemps.ExecuteTemplate(w, "imgList.html", item)
+	err = view.AdminTemps.ExecuteTemplate(w, "imgList.html", item)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -535,7 +536,7 @@ func ImageHandler(w http.ResponseWriter, r *http.Request) {
 		FileName: fn,
 	}
 
-	err := view.SellerTemps.ExecuteTemplate(w, "image.html", item)
+	err := view.AdminTemps.ExecuteTemplate(w, "image.html", item)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
