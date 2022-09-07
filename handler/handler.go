@@ -343,19 +343,14 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 			}
-
-			// update
-			if r.Form["table"][0] == "consumers" {
-				err = db.UpdateUser(diffMap, r.Form["id"][0], r.Form["table"][0])
-			} else {
-				err = db.UpdateUser(diffMap, r.Form["id"][0], r.Form["table"][0])
-			}
+		}
+		if 1 <= len(diffMap) {
+			err := db.UpdateUser(diffMap, r.Form["id"][0], r.Form["table"][0])
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 		}
-
 		http.Redirect(w, r, "/usrList", http.StatusFound)
 
 	} else {

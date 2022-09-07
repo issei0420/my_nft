@@ -21,7 +21,7 @@ func ConnectDb() {
 		User:                 os.Getenv("DBUSER"),
 		Passwd:               os.Getenv("DBPASS"),
 		Net:                  "tcp",
-		Addr:                 "orangebot.cluster-czickfmhh6ua.ap-northeast-1.rds.amazonaws.com:3306",
+		Addr:                 "localhost:3306",
 		DBName:               "nft",
 		AllowNativePasswords: true,
 	}
