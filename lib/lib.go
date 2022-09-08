@@ -51,6 +51,7 @@ func RandomPortion(soldP []uint8, units string) ([]uint8, error) {
 	for i := 0; i < lim; i++ {
 		r := rand.Intn(len(lotP))
 		randP = append(randP, lotP[r])
+		lotP = append(lotP[:r], lotP[r+1:]...)
 	}
 	return randP, nil
 }
