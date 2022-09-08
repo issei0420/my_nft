@@ -21,7 +21,7 @@ func ConnectDb() {
 		User:                 os.Getenv("DBUSER"),
 		Passwd:               os.Getenv("DBPASS"),
 		Net:                  "tcp",
-		Addr:                 "localhost:3306",
+		Addr:                 "127.0.0.1:3306",
 		DBName:               "nft",
 		AllowNativePasswords: true,
 	}
@@ -200,6 +200,9 @@ func GetPassword(table, mail string) (string, error) {
 	sq := fmt.Sprintf("SELECT password from %s where mail = ?", table)
 	row := db.QueryRow(sq, mail)
 	if err := row.Scan(&p); err != nil {
+		if err == sql.ErrNoRows {
+			return "", err
+		}
 		return "", fmt.Errorf("GetPassword: %v", err)
 	}
 	return p, nil
