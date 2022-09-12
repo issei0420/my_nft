@@ -21,7 +21,7 @@ func ConnectDb() {
 		User:                 os.Getenv("DBUSER"),
 		Passwd:               os.Getenv("DBPASS"),
 		Net:                  "tcp",
-		Addr:                 "orangebot.cluster-czickfmhh6ua.ap-northeast-1.rds.amazonaws.com:3306",
+		Addr:                 "localhost:3306",
 		DBName:               "nft",
 		AllowNativePasswords: true,
 	}
@@ -243,20 +243,26 @@ func GetSellerId(mail string) (int64, error) {
 type Image struct {
 	Id         string
 	Filename   string
+	Count      int
 	UploadDate string
 }
 
 func GetSellerImages(mail string) ([]Image, error) {
 	var imgs []Image
-	rows, err := db.Query("SELECT i.id, i.file_name, i.created_at FROM upload u "+
-		"INNER JOIN images i ON u.image_id = i.id INNER JOIN sellers s ON u.seller_id = s.id WHERE s.mail = ?", mail)
+	rows, err := db.Query("SELECT i.file_name, COUNT(portion), i.created_at FROM lottery l "+
+		"INNER JOIN portion p ON l.id = p.lottery_id "+
+		"RIGHT JOIN images i ON l.image_id = i.id "+
+		"LEFT JOIN upload u ON i.id = u.image_id "+
+		"INNER JOIN sellers s ON u.seller_id = s.id "+
+		"GROUP BY i.file_name, s.mail "+
+		"HAVING s.mail=?", mail)
 	if err != nil {
 		return imgs, fmt.Errorf("GetSellerImages: %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var img Image
-		if err := rows.Scan(&img.Id, &img.Filename, &img.UploadDate); err != nil {
+		if err := rows.Scan(&img.Filename, &img.Count, &img.UploadDate); err != nil {
 			return nil, fmt.Errorf("GetSellerImages: %v", err)
 		}
 		imgs = append(imgs, img)
@@ -269,14 +275,17 @@ func GetSellerImages(mail string) ([]Image, error) {
 
 func GetAllImages() ([]Image, error) {
 	var imgs []Image
-	rows, err := db.Query("SELECT id, file_name, created_at FROM images")
+	rows, err := db.Query("SELECT i.id, i.file_name, COUNT(portion), i.created_at FROM lottery l " +
+		"RIGHT JOIN images i ON l.image_id = i.id " +
+		"LEFT JOIN portion p ON l.id = p.lottery_id " +
+		"GROUP BY i.id")
 	if err != nil {
 		return imgs, fmt.Errorf("GetAllImages: %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var img Image
-		if err := rows.Scan(&img.Id, &img.Filename, &img.UploadDate); err != nil {
+		if err := rows.Scan(&img.Id, &img.Filename, &img.Count, &img.UploadDate); err != nil {
 			return nil, fmt.Errorf("GetAllImages: %v", err)
 		}
 		imgs = append(imgs, img)

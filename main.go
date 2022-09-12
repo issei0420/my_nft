@@ -32,5 +32,5 @@ func main() {
 
 	http.HandleFunc("/images", api.GetImages)
 
-	http.ListenAndServe(":8000", nil)
+	http.ListenAndServe(":8080", nil)
 }
