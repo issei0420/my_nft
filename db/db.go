@@ -454,15 +454,11 @@ func GetSoldPortions(fn string) ([]Portion, error) {
 	return portions, nil
 }
 
-// func GetImgNum(id string) (int, error) {
-// 	row := db.QueryRow("SELECT COUNT(portion) FROM lottery l INNER JOIN portion p ON l.id = p.lottery_id "+
-// 		"INNER JOIN consumers c ON l.consumer_id = c.id WHERE id = ?", id)
-// 	var n int
-// 	if err := row.Scan(&n); err != nil {
-// 		if err == sql.ErrNoRows {
-// 			return 0, fmt.Errorf("GetImgNum: No such consumer %d\n", n)
-// 		}
-// 		return 0, fmt.Errorf("GetImgNum: %v\n", err)
-// 	}
-// 	return n, nil
-// }
+func UpdatePassword(p, t string) error {
+	sq := fmt.Sprintf("UPDATE %s SET password = ?", t)
+	_, err := db.Exec(sq, p)
+	if err != nil {
+		return fmt.Errorf("UpdatePassword: %v", err)
+	}
+	return nil
+}

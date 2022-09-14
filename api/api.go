@@ -70,3 +70,24 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 	images = nil
 }
+
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	var password string
+	json.NewDecoder(r.Body).Decode(&password)
+
+	db.UpdatePassword("", "")
+
+	message := "疎通確認"
+	result := struct {
+		Message string `json:"message"`
+	}{
+		Message: message,
+	}
+	fmt.Println(result)
+	b, err := json.MarshalIndent(message, "", "\t")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
+}

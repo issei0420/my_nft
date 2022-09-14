@@ -1,15 +1,21 @@
-window.addEventListener("DOMContentLoaded", () => {
-    const yaunValue = document.getElementById("selectUserType").value 
-    initialize(yaunValue);
-}, false)
+const editButton = document.getElementById("edit-button")
+editButton.addEventListener("click", () => {
+    let newPass = prompt("新しいパスワードを入力してください");
+    updatePass(newPass).then(message => {
+        console.log(message);
+    })
+}, false);
 
-function initialize(yaunValue) {
-    const yaunTable = document.createElement("input");
-    yaunTable.type = "hidden";
-    yaunTable.name = "yaunTable"
-    yaunTable.id = "yaunTable"
-    yaunTable.value = yaunValue
-
-    const form = document.getElementById("form");
-    form.appendChild(yaunTable);
+async function updatePass(newPass) {
+    console.log(newPass);
+    url = 'http://localhost:8080/password'
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newPass)
+    })
+    
+    return res.json();
 }

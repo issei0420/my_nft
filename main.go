@@ -31,6 +31,7 @@ func main() {
 	http.HandleFunc("/myImage", handler.MyImageHandler)
 
 	http.HandleFunc("/images", api.GetImages)
+	http.HandleFunc("/password", api.UpdatePassword)
 
 	http.ListenAndServe(":8080", nil)
 }

@@ -31,7 +31,8 @@
           </div>
           <div class="mb-3">
             <label for="inputPassword" class="form-label">パスワード</label>
-            <input class="form-control" id="inputPassword" disabled><button>変更</button>
+            <input class="form-control" id="inputPassword" disabled>
+            <button id="edit-button" type="button">変更</button>
           </div>
           <div class="mb-3">
             <label for="selectUserType" class="form-label">権限</label>
@@ -85,7 +86,8 @@
         </div>
         <div class="mb-3">
           <label for="inputPassword" class="form-label">パスワード</label>
-          <input class="form-control" id="inputPassword" disabled><button>変更</button>
+          <input class="form-control" id="inputPassword" disabled>
+          <button id="edit-button" type="button">変更</button>
         </div>
         <div class="mb-3">
           <label for="selectUserType" class="form-label">権限</label>
@@ -113,7 +115,6 @@
       </div>
   </form>
   {{ end }}
-  </div>
     <script src="/static/js/validate.js"></script>
-  <script src="/static/js/edit.js"></script>
+    <script src="/static/js/edit.js"></script>
 {{ template "footer" .}}
