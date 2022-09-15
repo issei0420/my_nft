@@ -260,8 +260,15 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		// Form Values
+		fv := map[string]string{}
+		for k, v := range r.Form {
+			fv[k] = v[0]
+		}
+		// パスワードのハッシュ化
+		xpHash := lib.MakeHash(fv["password"])
 		// 会員情報の登録
-		if err := db.RegisterDb(r.Form); err != nil {
+		if err := db.RegisterDb(fv, xpHash); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -285,9 +292,11 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var u db.User
+		id := r.Form["id"][0]
+		table := r.Form["table"][0]
 		if r.Form["yaunTable"][0] == "consumers" {
 			var c db.Consumer
-			c, err := db.GetConsumerFromId(r.Form["id"][0])
+			c, err := db.GetConsumerFromId(id)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -297,7 +306,7 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			var s db.Seller
-			s, err := db.GetSellerFromId(r.Form["id"][0])
+			s, err := db.GetSellerFromId(id)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -318,12 +327,13 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if 1 <= len(UKMap) {
-			resMap, err := db.UniqueCheck(r.Form["table"][0], UKMap)
+			resMap, err := db.UniqueCheck(table, UKMap)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 			type Item struct {
+				Id       string
 				UserType string
 				ResMap   map[string]int
 				Form     url.Values
@@ -332,6 +342,7 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 			for _, v := range resMap {
 				if v == 0 {
 					item := Item{
+						Id:       "id",
 						UserType: "admin",
 						ResMap:   resMap,
 						Form:     r.Form,
@@ -346,7 +357,7 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if 1 <= len(diffMap) {
-			err := db.UpdateUser(diffMap, r.Form["id"][0], r.Form["table"][0])
+			err := db.UpdateUser(diffMap, id, table)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return

@@ -14,6 +14,8 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"crypto/sha512"
 )
 
 func RandomPortion(soldP []uint8, units string) ([]uint8, error) {
@@ -361,4 +363,10 @@ func GetWidth(path string) (int, error) {
 	}
 	srcBounds := srcImg.Bounds()
 	return srcBounds.Max.X, nil
+}
+
+func MakeHash(p string) string {
+	pbyte := []byte(p)
+	pHash := sha512.Sum512(pbyte)
+	return fmt.Sprintf("%x", pHash)
 }

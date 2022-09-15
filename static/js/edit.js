@@ -1,20 +1,31 @@
-const editButton = document.getElementById("edit-button")
-editButton.addEventListener("click", () => {
-    let newPass = prompt("新しいパスワードを入力してください");
-    updatePass(newPass).then(message => {
-        console.log(message);
-    })
-}, false);
+window.addEventListener('DOMContentLoaded', function() {
+    const editButton = document.getElementById("edit-button")
+    const userId = document.getElementById("user-id").value
+    const userType = document.getElementById("selectUserType").value
 
-async function updatePass(newPass) {
-    console.log(newPass);
+    editButton.addEventListener("click", () => {
+        const newPass = prompt("新しいパスワードを入力してください");
+        const data = {
+            id      : userId,
+            password: newPass,
+            table: userType,
+        }
+
+        updatePass(data).then(message => {
+            window.alert(message);
+        })
+    }, false);
+
+});
+
+async function updatePass(data) {
     url = 'http://localhost:8080/password'
     const res = await fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newPass)
+        body: JSON.stringify(data)
     })
     
     return res.json();

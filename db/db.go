@@ -4,10 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
-
-	"crypto/sha512"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -39,16 +36,7 @@ func ConnectDb() {
 	fmt.Println("Database Connected!")
 }
 
-func RegisterDb(form url.Values) error {
-	// Form Values
-	fv := map[string]string{}
-	for k, v := range form {
-		fv[k] = v[0]
-	}
-	// encoded password
-	pbyte := []byte(fv["password"])
-	pHash := sha512.Sum512(pbyte)
-	xpHash := fmt.Sprintf("%x", pHash)
+func RegisterDb(fv map[string]string, xpHash string) error {
 	// Sellers
 	if fv["table"] == "sellers" {
 		_, err := db.Exec("INSERT INTO sellers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
@@ -454,9 +442,9 @@ func GetSoldPortions(fn string) ([]Portion, error) {
 	return portions, nil
 }
 
-func UpdatePassword(p, t string) error {
-	sq := fmt.Sprintf("UPDATE %s SET password = ?", t)
-	_, err := db.Exec(sq, p)
+func UpdatePassword(p, t, id string) error {
+	sq := fmt.Sprintf("UPDATE %s SET password = ? WHERE id = ? ", t)
+	_, err := db.Exec(sq, p, id)
 	if err != nil {
 		return fmt.Errorf("UpdatePassword: %v", err)
 	}

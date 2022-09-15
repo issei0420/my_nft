@@ -1,9 +1,10 @@
 {{ template "header" .}}
 <div class="container">
     <div class="register text-center fs-5">
-      <span class="border-bottom border-secondary border-1 p-1">新規登録</span>
+      <span class="border-bottom border-secondary border-1 p-1">会員情報編集</span>
     </div>
     {{ if .Form }}
+    <input type="hidden" value="{{ .Id }}" id="user-id">
     <form action="/edit" method="post" id="form">
         <input type="hidden" value="{{ index .Form.id 0 }}" name="id">
         <label for="" class="form-label mt-3">姓名</label>
@@ -64,7 +65,7 @@
         {{ $user = .User.Seller }}
       {{ end }}
     <form action="/edit" method="post" id="form">
-      <input type="hidden" value="{{ $user.Id }}" name="id">
+      <input type="hidden" value="{{ $user.Id }}" name="id" id="user-id">
       <label for="" class="form-label mt-3">姓名</label>
       <div class="input-group  mb-3">
         <input type="text" aria-label="Last name" class="required form-control" id="lastNameInput" name="familyName" value="{{ $user.FamilyName }}">

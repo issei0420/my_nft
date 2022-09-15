@@ -71,19 +71,26 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 	images = nil
 }
 
+type data struct {
+	Password string
+	Table    string
+	Id       string
+}
+
 func UpdatePassword(w http.ResponseWriter, r *http.Request) {
-	var password string
-	json.NewDecoder(r.Body).Decode(&password)
+	var d data
+	json.NewDecoder(r.Body).Decode(&d)
 
-	db.UpdatePassword("", "")
-
-	message := "疎通確認"
-	result := struct {
-		Message string `json:"message"`
-	}{
-		Message: message,
+	// パスワードのハッシュ化
+	xpHash := lib.MakeHash(d.Password)
+	// パスワードの更新
+	var message string
+	err := db.UpdatePassword(xpHash, d.Table, d.Id)
+	if err != nil {
+		message = "パスワードの更新に失敗しました"
+	} else {
+		message = "パスワードを変更しました"
 	}
-	fmt.Println(result)
 	b, err := json.MarshalIndent(message, "", "\t")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
