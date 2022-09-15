@@ -131,6 +131,7 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+			return
 		}
 		// check password
 		pswd, err := os.ReadFile("data/pswd.txt")
