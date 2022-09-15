@@ -41,9 +41,7 @@
                 {{ $t := index .Form.table 0}}
                 {{ if eq $t "consumers"}}
                 <option value="consumers" selected>利用者</option>
-                <option value="sellers">出品者</option>
                 {{ else }}
-                <option value="consumers">利用者</option>
                 <option value="sellers" selected>出品者</option>
                 {{ end }}
             </select>
@@ -92,12 +90,9 @@
         <div class="mb-3">
           <label for="selectUserType" class="form-label">権限</label>
           <select class="required form-select" aria-label="Default select example" id="selectUserType" name="table">
-              <!-- <option selected disabled value="">未選択</option> -->
               {{ if .IsConsumer }}
               <option value="consumers" selected>利用者</option>
-              <!-- <option value="sellers">出品者</option> -->
               {{ else }}
-              <!-- <option value="consumers">利用者</option> -->
               <option value="sellers" selected>出品者</option>
               {{ end }}
           </select>
