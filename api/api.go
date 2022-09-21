@@ -100,15 +100,13 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPortionTotal(w http.ResponseWriter, r *http.Request) {
-	var id []string
-	json.NewDecoder(r.Body).Decode(&id)
-	res, err := db.GetPortionTotal()
+	total, err := db.GetPortionTotal()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	b, err := json.MarshalIndent(res, "", "\t")
+	b, err := json.MarshalIndent(total, "", "\t")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
