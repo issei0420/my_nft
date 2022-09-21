@@ -23,6 +23,7 @@
             <tbody>
               {{ range .Consumers}}
               <tr>
+                <input type="hidden" class="image_id" value="{{.Id}}">
                 <td>{{ .FamilyName }} {{ .FirstName }}</td>
                 <td>{{ .Nickname }}</td>
                 <td>{{ .Mail }}</td>
@@ -51,7 +52,7 @@
               </tr>
             </thead>
             <tbody>
-              {{ range .Sellers}}
+              {{ range .Sellers }}
               <tr>
                 <td>{{ .FamilyName }} {{ .FirstName }}</td>
                 <td>{{ .Nickname }}</td>
@@ -66,4 +67,5 @@
             </tbody>
           </table>
     </div>
+    <script src="/static/js/usrList.js"></script>
 {{ template "footer" .}}

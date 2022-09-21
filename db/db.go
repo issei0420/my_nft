@@ -450,3 +450,30 @@ func UpdatePassword(p, t, id string) error {
 	}
 	return nil
 }
+
+type Total struct {
+	Id       int
+	FileName string
+	Count    int
+}
+
+func GetPortionTotal() ([]Total, error) {
+	var everyTotal []Total
+
+	rows, err := db.Query("select l.consumer_id, i.file_name, count(portion)  from lottery l inner join consumers c on l.consumer_id = c.id inner join images i on l.image_id = i.id inner join portion p on l.id = p.lottery_id group by l.consumer_id, l.image_id")
+	if err != nil {
+		return nil, fmt.Errorf("GetPortionTotal: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var t Total
+		if err := rows.Scan(&t.Id, &t.FileName, &t.Count); err != nil {
+			return nil, fmt.Errorf("GetPortionTotal: %v", err)
+		}
+		everyTotal = append(everyTotal, t)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("GetPortionTotal: %v", err)
+	}
+	return everyTotal, nil
+}

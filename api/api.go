@@ -98,3 +98,20 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(b)
 }
+
+func GetPortionTotal(w http.ResponseWriter, r *http.Request) {
+	var id []string
+	json.NewDecoder(r.Body).Decode(&id)
+	res, err := db.GetPortionTotal()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	b, err := json.MarshalIndent(res, "", "\t")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
+}
