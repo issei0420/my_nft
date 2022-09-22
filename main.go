@@ -33,6 +33,7 @@ func main() {
 	http.HandleFunc("/images", api.GetImages)
 	http.HandleFunc("/password", api.UpdatePassword)
 	http.HandleFunc("/portion", api.GetPortionTotal)
+	http.HandleFunc("/uploaded", api.GetUploadedImages)
 
 	http.ListenAndServe(":8080", nil)
 }

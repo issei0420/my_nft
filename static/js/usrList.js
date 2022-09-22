@@ -4,10 +4,18 @@ window.addEventListener("DOMContentLoaded", () => {
     for (elem of hiddenInputs) {
         imageIds.push(elem.value);
     }
+
     getPortionTotal(imageIds).then(total => {
         showData = shapeData(total);
         setTooltip(showData);
+
+         getSellerImage().then(images => {
+            showInfo = shapeInfo(images);
+            setTooltipInfo(showInfo);
+            activateToolTip();
+        })
     })
+
 }, false);
 
 async function getPortionTotal(imageIds) {
@@ -43,10 +51,6 @@ function setTooltip (showData) {
         text = createText(showData, id);
         td.setAttribute("data-bs-original-title", text)
     }
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
 }
 
 function createText(showData, id) {
@@ -56,4 +60,46 @@ function createText(showData, id) {
         text = text + `<p>${fileName}  ${totalData[fileName]}枚</p>`
     }
     return text;
+}
+
+async function getSellerImage() {
+    const res = await fetch(`http://localhost:8080/uploaded`)
+    return res.json();
+}
+
+function shapeInfo(images) {
+    showInfo = {}
+    for (elem of images) {
+        showInfo[elem["Id"]] = []
+    }
+    for (elem of images) {
+        showInfo[elem["Id"]].push(elem["FileName"])
+    }
+    return showInfo
+}
+
+function activateToolTip() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+}
+
+function setTooltipInfo(showInfo) {
+    for (id in showInfo){
+        const td = document.getElementById(`i-${id}`);
+        td.setAttribute("data-bs-toggle", "tooltip");
+        td.setAttribute("data-bs-html", "true");
+        td.setAttribute("data-bs-placement", "right");
+        info = createInfo(showInfo, id)
+        td.setAttribute("data-bs-original-title", info);
+    }
+}
+
+function createInfo(showInfo, id) {
+    info = ""
+    for (filename of showInfo[id]) {
+        info +=  `<p>${filename}</p>`
+    }
+    return info;
 }

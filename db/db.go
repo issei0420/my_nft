@@ -477,3 +477,28 @@ func GetPortionTotal() ([]Total, error) {
 	}
 	return everyTotal, nil
 }
+
+type Uploaded struct {
+	Id       int
+	FileName string
+}
+
+func GetUploadedImages() ([]Uploaded, error) {
+	var allUploaded []Uploaded
+	rows, err := db.Query("select u.seller_id, i.file_name from upload u right join sellers s on u.seller_id = s.id inner join images i on u.image_id = i.id;")
+	if err != nil {
+		return nil, fmt.Errorf("GetUploadedImages: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var u Uploaded
+		if err := rows.Scan(&u.Id, &u.FileName); err != nil {
+			return nil, fmt.Errorf("GetUploadedImages: %v", err)
+		}
+		allUploaded = append(allUploaded, u)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("GetUploadeImages: %v", err)
+	}
+	return allUploaded, nil
+}

@@ -113,3 +113,18 @@ func GetPortionTotal(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(b)
 }
+
+func GetUploadedImages(w http.ResponseWriter, r *http.Request) {
+	images, err := db.GetUploadedImages()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	b, err := json.MarshalIndent(images, "", "\t")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
+}

@@ -52,6 +52,7 @@
                 <th scope="col">ニックネーム</th>
                 <th scope="col">メールアドレス</th>
                 <th scope="col">会社名</th>
+                <th scope="col">出品画像</th>
                 <th scope="col">編集</th>
               </tr>
             </thead>
@@ -62,6 +63,7 @@
                 <td>{{ .Nickname }}</td>
                 <td>{{ .Mail }}</td>
                 <td>{{ .Company }}</td>
+                <td><i class="bi bi-eye-fill fs-5 ps-3" id="i-{{ .Id }}"></i></td>
                 <td>
                   <a href="/edit?utype=seller&id={{ .Id }}" class="editButton seller" role="button">
                     <i class="bi bi-pencil-square fs-5"></i>
