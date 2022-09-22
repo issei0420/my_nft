@@ -28,7 +28,11 @@
                 <td>{{ .Nickname }}</td>
                 <td>{{ .Mail }}</td>
                 <td>{{ .Company }}</td>
+                {{ if eq .ImgNum "0" }}
                 <td>{{ .ImgNum }}</td>
+                {{ else }}
+                <td>{{ .ImgNum }}<i class="bi bi-eye-fill fs-5 ps-3" id="{{ .Id }}"></i></td>
+                {{ end }}
                 <td>
                   <a href="/edit?utype=consumer&id={{ .Id }}" class="editButton consumer" role="button">
                     <i class="bi bi-pencil-square fs-5"></i>

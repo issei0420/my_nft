@@ -5,16 +5,12 @@ window.addEventListener('DOMContentLoaded', function() {
 let portionInfo = {};
 let flag = true;
 
-const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-  return new bootstrap.Tooltip(tooltipTriggerEl)
-})
 
 function showImages() {
     const divImage = document.getElementById("divImage")
     const filename = document.getElementById("fileName").innerHTML
     async function callApi() {
-        const res = await fetch(`http://3.114.104.27:8000/images?filename=${filename}`);
+        const res = await fetch(`http://localhost:8080/images?filename=${filename}`);
         const resObj = await res.json();
         divImage.style.width = resObj["width"] + "px";
         // 画像を表示

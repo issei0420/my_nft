@@ -5,7 +5,8 @@ window.addEventListener("DOMContentLoaded", () => {
         imageIds.push(elem.value);
     }
     getPortionTotal(imageIds).then(total => {
-        shapeData(total)
+        showData = shapeData(total);
+        setTooltip(showData);
     })
 }, false);
 
@@ -24,10 +25,35 @@ async function getPortionTotal(imageIds) {
 function shapeData(total) {
     let showData = {}
     for (elem of total) {
-        showData[elem["Id"]] = []
+        showData[elem["Id"]] = {}
     }
     for (elem of total) { 
-        showData[elem["Id"]].push([elem["FileName"], elem["Count"]])
+        showData[elem["Id"]][elem["FileName"]] = elem["Count"]
     }
+    return showData
 }
 
+function setTooltip (showData) {
+    for (id in showData) {
+        const td = document.getElementById(id);
+        // ツールチップの準備
+        td.setAttribute("data-bs-toggle", "tooltip");
+        td.setAttribute("data-bs-html", "true");
+        td.setAttribute("data-bs-placement", "right");
+        text = createText(showData, id);
+        td.setAttribute("data-bs-original-title", text)
+    }
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+}
+
+function createText(showData, id) {
+    totalData = showData[id]
+    text = ""
+    for (fileName in totalData) {
+        text = text + `<p>${fileName}  ${totalData[fileName]}枚</p>`
+    }
+    return text;
+}
