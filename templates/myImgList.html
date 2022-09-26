@@ -7,12 +7,14 @@
         <thead>
           <tr>
             <th scope="col">画像名</th>
+            <th scope="col">保有枚数</th>
           </tr>
         </thead>
         <tbody>
           {{ range .MyImgs }}
           <tr>
             <td><a class="btn btn-link" href="/myImage?id={{ .Id }}&filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
+            <td>{{ .CountPortion }}</td>
           </tr>
           {{ end }}
         </tbody>

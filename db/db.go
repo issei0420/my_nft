@@ -349,21 +349,21 @@ func UpdateUnits(mail string, units int) error {
 }
 
 type MyImage struct {
-	Id       int
-	Filename string
+	Id           int
+	Filename     string
+	CountPortion string
 }
 
 func GetAllMyImages(mail string) ([]MyImage, error) {
 	var myImgs []MyImage
-	rows, err := db.Query("SELECT DISTINCT i.id, i.file_name FROM lottery l INNER JOIN images i ON l.image_id = i.id "+
-		"INNER JOIN consumers c ON l.consumer_id = c.id WHERE c.mail= ?", mail)
+	rows, err := db.Query("SELECT i.id, i.file_name, count(portion) FROM lottery l INNER JOIN  images i ON l.image_id = i.id INNER JOIN consumers c ON l.consumer_id = c.id inner join portion p on l.id = p.lottery_id WHERE c.mail = ? group by i.id", mail)
 	if err != nil {
 		return nil, fmt.Errorf("GetAllMyImages: %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var myImg MyImage
-		if err := rows.Scan(&myImg.Id, &myImg.Filename); err != nil {
+		if err := rows.Scan(&myImg.Id, &myImg.Filename, &myImg.CountPortion); err != nil {
 			return nil, fmt.Errorf("GetAllMyImages: %v", err)
 		}
 		myImgs = append(myImgs, myImg)
