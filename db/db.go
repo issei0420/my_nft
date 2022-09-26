@@ -230,10 +230,12 @@ func GetSellerId(mail string) (int64, error) {
 }
 
 type Image struct {
-	Id         string
-	Filename   string
-	Count      int
-	UploadDate string
+	Id           string
+	SellerFamily string
+	SellerFirst  string
+	Filename     string
+	Count        int
+	UploadDate   string
 }
 
 func GetSellerImages(mail string) ([]Image, error) {
@@ -264,17 +266,18 @@ func GetSellerImages(mail string) ([]Image, error) {
 
 func GetAllImages() ([]Image, error) {
 	var imgs []Image
-	rows, err := db.Query("SELECT i.id, i.file_name, COUNT(portion), i.created_at FROM lottery l " +
-		"RIGHT JOIN images i ON l.image_id = i.id " +
-		"LEFT JOIN portion p ON l.id = p.lottery_id " +
-		"GROUP BY i.id")
+	rows, err := db.Query("SELECT A.id, A.file_name, s.family_name, s.first_name, A.count, u.created_at FROM " +
+		"( SELECT i.id, i.file_name, COUNT(portion) AS count, i.created_at FROM lottery l " +
+		"RIGHT JOIN images i ON l.image_id = i.id LEFT JOIN portion p ON l.id = p.lottery_id " +
+		"LEFT JOIN upload u ON i.id = u.image_id LEFT JOIN sellers s ON u.seller_id = s.id GROUP BY i.id) AS A " +
+		"LEFT JOIN upload u ON A.id = u.image_id LEFT JOIN sellers s ON u.seller_id = s.id")
 	if err != nil {
 		return imgs, fmt.Errorf("GetAllImages: %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var img Image
-		if err := rows.Scan(&img.Id, &img.Filename, &img.Count, &img.UploadDate); err != nil {
+		if err := rows.Scan(&img.Id, &img.Filename, &img.SellerFamily, &img.SellerFirst, &img.Count, &img.UploadDate); err != nil {
 			return nil, fmt.Errorf("GetAllImages: %v", err)
 		}
 		imgs = append(imgs, img)
