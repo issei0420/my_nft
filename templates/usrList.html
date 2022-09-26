@@ -1,7 +1,11 @@
 {{ template "header" .}}
     <div class="contents">
         <div class="register text-center fs-5">
+          {{ if eq .UserType "admin"}}
           <span class="border-bottom border-secondary border-1 p-1">会員一覧</span>
+          {{ else }}
+          <span class="border-bottom border-secondary border-1 p-1">利用者一覧</span>
+          {{ end }}
         </div>
         <div class="text-end">
           <a id="register-btn" href="/register" class="btn" role="button" id="test">新規登録</a>
@@ -41,8 +45,9 @@
               </tr>
               {{ end }}
             </tbody>
+          {{ if eq .UserType "admin"}}
           </table>
-          <table class="table">
+          <table class="table" id="seller-table">
             <thead>
               <tr>
                 <th>出品者</th>
@@ -76,6 +81,8 @@
               {{ end }}
             </tbody>
           </table>
+          {{ else }}
+          {{ end }}
     </div>
     <script src="/static/js/usrList.js"></script>
 {{ template "footer" .}}

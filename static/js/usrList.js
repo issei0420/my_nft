@@ -9,7 +9,12 @@ window.addEventListener("DOMContentLoaded", () => {
         showData = shapeData(total);
         setTooltip(showData);
 
-         getSellerImage().then(images => {
+        const sellerTable = document.getElementById("seller-table");
+        if (sellerTable == undefined) {
+            activateToolTip();
+            return
+        }
+        getSellerImage().then(images => {
             showInfo = shapeInfo(images);
             setTooltipInfo(showInfo);
             activateToolTip();

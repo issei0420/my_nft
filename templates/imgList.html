@@ -7,19 +7,31 @@
         <thead>
           <tr>
             <th scope="col">画像名</th>
+            {{ if eq .UserType "admin"}}
             <th scope="col">出品者</th>
+            {{ end }}
             <th scope="col">抽選済み枚数</th>
             <th scope="col">登録日</th>
           </tr>
         </thead>
         <tbody>
-          {{ range .Images }}
-          <tr>
-            <td><a class="btn btn-link" href="/image?filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
-            <td>{{ .SellerFamily }}  {{ .SellerFirst }}</td>
-            <td>{{ .Count }}</td>
-            <td>{{ .UploadDate }}</td>
-          </tr>
+          {{ if eq .UserType "admin"}}
+            {{ range .Images }}
+            <tr>
+              <td><a class="btn btn-link" href="/image?filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
+              <td>{{ .SellerFamily }}  {{ .SellerFirst }}</td>
+              <td>{{ .Count }}</td>
+              <td>{{ .UploadDate }}</td>
+            </tr>
+            {{ end }} 
+          {{ else }}
+            {{ range .Images }}
+            <tr>
+              <td><a class="btn btn-link" href="/image?filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
+              <td>{{ .Count }}</td>
+              <td>{{ .UploadDate }}</td>
+            </tr>
+            {{ end }} 
           {{ end }}
         </tbody>
       </table>

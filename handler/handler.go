@@ -186,7 +186,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UsrListHandler(w http.ResponseWriter, r *http.Request) {
-	_, utype := sessionManager(w, r, "admin")
+	_, utype := sessionManager(w, r, "seller")
 	err := view.AdminParse()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
