@@ -94,6 +94,7 @@ type Seller struct {
 	Nickname   string
 	Mail       string
 	Company    string
+	UploadNum  string
 }
 
 type User struct {
@@ -152,14 +153,14 @@ func UpdateUser(diffMap map[string]string, id, table string) error {
 
 func GetAllSellers() ([]Seller, error) {
 	var slrs []Seller
-	rows, err := db.Query("SELECT id, family_name, first_name, nickname, mail, company FROM sellers")
+	rows, err := db.Query("select s.id, s.family_name, s.first_name, s.nickname, s.mail, s.company, count(u.id) from sellers s left join upload u on s.id = u.seller_id group by s.id;")
 	if err != nil {
 		return slrs, fmt.Errorf("getAllSellers: %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var slr Seller
-		if err := rows.Scan(&slr.Id, &slr.FamilyName, &slr.FirstName, &slr.Nickname, &slr.Mail, &slr.Company); err != nil {
+		if err := rows.Scan(&slr.Id, &slr.FamilyName, &slr.FirstName, &slr.Nickname, &slr.Mail, &slr.Company, &slr.UploadNum); err != nil {
 			return nil, fmt.Errorf("getAllSellers: %v", err)
 		}
 		slrs = append(slrs, slr)
