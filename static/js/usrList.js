@@ -24,7 +24,7 @@ window.addEventListener("DOMContentLoaded", () => {
 }, false);
 
 async function getPortionTotal(imageIds) {
-    url = 'http://localhost:8080/portion'
+    url = 'http://3.114.104.27:8000/portion'
     const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -68,7 +68,7 @@ function createText(showData, id) {
 }
 
 async function getSellerImage() {
-    const res = await fetch(`http://localhost:8080/uploaded`)
+    const res = await fetch(`http://3.114.104.27:8000/uploaded`)
     return res.json();
 }
 

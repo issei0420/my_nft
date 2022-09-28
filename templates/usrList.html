@@ -21,10 +21,14 @@
                 <th scope="col">メールアドレス</th>
                 <th scope="col">会社名</th>
                 <th scope="col">保有枚数</th>
+                {{ if eq .UserType "admin" }}
                 <th scope="col">編集</th>
+                {{ end }}
               </tr>
             </thead>
             <tbody>
+            {{ if eq .UserType "admin"}}
+            
               {{ range .Consumers}}
               <tr>
                 <input type="hidden" class="image_id" value="{{.Id}}">
@@ -44,6 +48,26 @@
                 </td>
               </tr>
               {{ end }}
+
+            {{ else }}
+
+              {{ range .Consumers}}
+              <tr>
+                <input type="hidden" class="image_id" value="{{.Id}}">
+                <td>{{ .FamilyName }} {{ .FirstName }}</td>
+                <td>{{ .Nickname }}</td>
+                <td>{{ .Mail }}</td>
+                <td>{{ .Company }}</td>
+                {{ if eq .ImgNum "0" }}
+                <td>{{ .ImgNum }}</td>
+                {{ else }}
+                <td>{{ .ImgNum }}<i class="bi bi-eye-fill fs-5 ps-3" id="{{ .Id }}"></i></td>
+                {{ end }}
+              </tr>
+              {{ end }}
+
+            {{ end }}
+
             </tbody>
           {{ if eq .UserType "admin"}}
           </table>
