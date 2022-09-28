@@ -487,7 +487,10 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		_, utype := sessionManager(w, r, "seller")
-		view.SellerParse()
+		if err := view.SellerParse(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		item := struct {
 			UserType string
 			Message  string
@@ -525,7 +528,15 @@ func ImgListHandler(w http.ResponseWriter, r *http.Request) {
 		UserType: utype,
 		Images:   imgs,
 	}
-	err = view.AdminTemps.ExecuteTemplate(w, "imgList.html", item)
+
+	if utype == "admin" {
+		err = view.AdminTemps.ExecuteTemplate(w, "imgList.html", item)
+	} else if utype == "seller" {
+		err = view.SellerTemps.ExecuteTemplate(w, "imgList.html", item)
+	} else {
+		log.Fatal()
+	}
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
