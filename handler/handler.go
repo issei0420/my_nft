@@ -294,7 +294,7 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 		var u db.User
 		id := r.Form["id"][0]
 		table := r.Form["table"][0]
-		if r.Form["yaunTable"][0] == "consumers" {
+		if table == "consumers" {
 			var c db.Consumer
 			c, err := db.GetConsumerFromId(id)
 			if err != nil {
