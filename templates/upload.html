@@ -2,9 +2,9 @@
 <div class="text-center fs-5">
     <span class="border-bottom border-secondary border-1 p-1">画像アップロード</span>
 </div>
-<div class="upload d-flex justify-content-center align-items-center">
-    <form method="post" enctype="multipart/form-data" action="/upload" class="text-center">
-        <div id="upload-box" class="p-5">
+<div class="upload d-flex justify-content-center align-items-center mt-4">
+    <form method="post" enctype="multipart/form-data" action="/upload" class="text-center upload-form">
+        <div id="upload-box" class="p-5 d-flex justify-content-center align-items-center">
             <div id="upload-box-contents text-center">
                 <p>ここにファイルをドロップ</p>
                 <p>または</p>
@@ -12,7 +12,7 @@
                 <input type="hidden" id="file-name" name="file-name">
             </div>
         </div>
-        <div class="upload-submit mt-3">
+        <div class="upload-submit mt-4">
             <h1 class="h6 mb-3 fw-normal text-danger">{{ .Message }}</h1>
             <input type="submit" value="アップロード">
         </div>

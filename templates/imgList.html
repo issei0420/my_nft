@@ -18,18 +18,18 @@
           {{ if eq .UserType "admin"}}
             {{ range .Images }}
             <tr>
-              <td><a class="btn btn-link" href="/image?filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
-              <td>{{ .SellerFamily }}  {{ .SellerFirst }}</td>
-              <td>{{ .Count }}</td>
-              <td>{{ .UploadDate }}</td>
+              <td class="align-middle"><a class="btn btn-link" href="/image?filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
+              <td class="align-middle">{{ .SellerFamily }}  {{ .SellerFirst }}</td>
+              <td class="align-middle">{{ .Count }}</td>
+              <td class="align-middle">{{ .UploadDate }}</td>
             </tr>
             {{ end }} 
           {{ else }}
             {{ range .Images }}
             <tr>
-              <td><a class="btn btn-link" href="/image?filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
-              <td>{{ .Count }}</td>
-              <td>{{ .UploadDate }}</td>
+              <td class="align-middle"><a class="btn btn-link" href="/image?filename={{ .Filename }}" role="button">{{ .Filename }}</a></td>
+              <td class="align-middle">{{ .Count }}</td>
+              <td class="align-middle">{{ .UploadDate }}</td>
             </tr>
             {{ end }} 
           {{ end }}

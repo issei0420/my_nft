@@ -22,14 +22,17 @@ body {
 /* upload */
 .upload {
     height: 100% !important;
-    margin-top: 2rem;
 }
 #upload-box {
     outline: dashed 1px;
     background-color: rgb(242, 242, 242);
+    height: calc(640px / 1.618);
 }
 input#file-input {
     padding: auto !important;
+}
+.upload-form {
+    width: 640px;
 }
 
 /* lottery*/

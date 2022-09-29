@@ -19,7 +19,7 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 async function updatePass(data) {
-    url = 'http://3.114.104.27:8000/password'
+    url = 'http://localhost:8080/password'
     const res = await fetch(url, {
         method: 'POST',
         headers: {

@@ -32,16 +32,16 @@
               {{ range .Consumers}}
               <tr>
                 <input type="hidden" class="image_id" value="{{.Id}}">
-                <td>{{ .FamilyName }} {{ .FirstName }}</td>
-                <td>{{ .Nickname }}</td>
-                <td>{{ .Mail }}</td>
-                <td>{{ .Company }}</td>
+                <td class="align-middle">{{ .FamilyName }} {{ .FirstName }}</td>
+                <td class="align-middle">{{ .Nickname }}</td>
+                <td class="align-middle">{{ .Mail }}</td>
+                <td class="align-middle">{{ .Company }}</td>
                 {{ if eq .ImgNum "0" }}
-                <td>{{ .ImgNum }}</td>
+                <td class="align-middle">{{ .ImgNum }}</td>
                 {{ else }}
-                <td>{{ .ImgNum }}<i class="bi bi-eye-fill fs-5 ps-3" id="{{ .Id }}"></i></td>
+                <td class="align-middle">{{ .ImgNum }}<i class="bi bi-eye-fill fs-5 ps-3" id="{{ .Id }}"></i></td>
                 {{ end }}
-                <td>
+                <td class="align-middle">
                   <a href="/edit?utype=consumer&id={{ .Id }}" class="editButton consumer" role="button">
                     <i class="bi bi-pencil-square fs-5"></i>
                   </a>
@@ -54,14 +54,14 @@
               {{ range .Consumers}}
               <tr>
                 <input type="hidden" class="image_id" value="{{.Id}}">
-                <td>{{ .FamilyName }} {{ .FirstName }}</td>
-                <td>{{ .Nickname }}</td>
-                <td>{{ .Mail }}</td>
-                <td>{{ .Company }}</td>
+                <td class="align-middle">{{ .FamilyName }} {{ .FirstName }}</td>
+                <td class="align-middle">{{ .Nickname }}</td>
+                <td class="align-middle">{{ .Mail }}</td>
+                <td class="align-middle">{{ .Company }}</td>
                 {{ if eq .ImgNum "0" }}
-                <td>{{ .ImgNum }}</td>
+                <td class="align-middle">{{ .ImgNum }}</td>
                 {{ else }}
-                <td>{{ .ImgNum }}<i class="bi bi-eye-fill fs-5 ps-3" id="{{ .Id }}"></i></td>
+                <td class="align-middle">{{ .ImgNum }}<i class="bi bi-eye-fill fs-5 ps-3" id="{{ .Id }}"></i></td>
                 {{ end }}
               </tr>
               {{ end }}
@@ -88,16 +88,16 @@
             <tbody>
               {{ range .Sellers }}
               <tr>
-                <td>{{ .FamilyName }} {{ .FirstName }}</td>
-                <td>{{ .Nickname }}</td>
-                <td>{{ .Mail }}</td>
-                <td>{{ .Company }}</td>
+                <td class="align-middle">{{ .FamilyName }} {{ .FirstName }}</td>
+                <td class="align-middle">{{ .Nickname }}</td>
+                <td class="align-middle">{{ .Mail }}</td>
+                <td class="align-middle">{{ .Company }}</td>
                 {{ if eq .UploadNum "0" }}
-                <td>{{ .UploadNum }}</td>
+                <td class="align-middle">{{ .UploadNum }}</td>
                 {{ else }}
-                <td>{{ .UploadNum }}<i class="bi bi-eye-fill fs-5 ps-3" id="i-{{ .Id }}"></i></td>
+                <td class="align-middle">{{ .UploadNum }}<i class="bi bi-eye-fill fs-5 ps-3" id="i-{{ .Id }}"></i></td>
                 {{ end }}
-                <td>
+                <td class="align-middle">
                   <a href="/edit?utype=seller&id={{ .Id }}" class="editButton seller" role="button">
                     <i class="bi bi-pencil-square fs-5"></i>
                   </a></td>
