@@ -506,3 +506,28 @@ func GetUploadedImages() ([]Uploaded, error) {
 	}
 	return allUploaded, nil
 }
+
+type ImageNames struct {
+	Id       int
+	FileName string
+}
+
+func GetAllImageNames() ([]ImageNames, error) {
+	var imgs []ImageNames
+	rows, err := db.Query("SELECT id, file_name FROM images")
+	if err != nil {
+		return nil, fmt.Errorf("GetAllImageNames: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var img ImageNames
+		if err := rows.Scan(&img.Id, &img.FileName); err != nil {
+			return nil, fmt.Errorf("GetAllImageNames: %v", err)
+		}
+		imgs = append(imgs, img)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("GetAllImageNames: %v", err)
+	}
+	return imgs, nil
+}

@@ -223,7 +223,9 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	type Item struct {
 		UserType string
 		ResMap   map[string]int
+		Images   []db.ImageNames
 		Form     url.Values
+		Array    [100]int
 	}
 
 	if err := view.AdminParse(); err != nil {
@@ -274,8 +276,20 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/usrList", http.StatusFound)
 	} else {
-		item := Item{UserType: "admin", Form: nil}
-		err := view.AdminTemps.ExecuteTemplate(w, "register.html", item)
+
+		var imgs []db.ImageNames
+		imgs, err := db.GetAllImageNames()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		var array [100]int
+		for i := 0; i < 100; i++ {
+			array[i] = i + 1
+		}
+
+		item := Item{UserType: "admin", Images: imgs, Form: nil, Array: array}
+		err = view.AdminTemps.ExecuteTemplate(w, "register.html", item)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

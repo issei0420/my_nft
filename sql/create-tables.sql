@@ -27,6 +27,22 @@ CREATE TABLE consumers (
     PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS tickets;
+CREATE TABLE tickets (
+    id               INT NOT NULL AUTO_INCREMENT,
+    consumer_id      INT NOT NULL,
+    image_id         INT NOT NULL,
+    lottery_units    TINYINT NOT NULL,
+    mail             VARCHAR(254) UNIQUE NOT NULL,
+    password         VARCHAR(128) NOT NULL,
+    created_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+
+    FOREIGN KEY (consumer_id)
+        REFERENCES consumers(id)
+);
+
 DROP TABLE IF EXISTS images;
 CREATE TABLE images (
     id            INT NOT NULL AUTO_INCREMENT,

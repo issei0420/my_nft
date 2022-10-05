@@ -16,7 +16,13 @@ body {
 
 /* register */
 .container {
-    max-width: 960px !important;
+    max-width: 900px !important;
+}
+.select-width {
+    width: 120px !important;
+}
+.theme-color {
+    background-color: rgb(35, 35, 58) !important;
 }
 
 /* upload */

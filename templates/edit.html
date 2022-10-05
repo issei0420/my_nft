@@ -32,12 +32,11 @@
           </div>
           <div class="mb-3">
             <label for="inputPassword" class="form-label">パスワード</label>
-            <input class="form-control" id="inputPassword" disabled>
-            <button id="edit-button" type="button">変更</button>
+            <div><button id="edit-button" type="button">変更</button></div>
           </div>
           <div class="mb-3">
             <label for="selectUserType" class="form-label">権限</label>
-            <select class="required form-select" aria-label="Default select example" id="selectUserType" name="table">
+            <select class="required form-select select-width" aria-label="Default select example" id="selectUserType" name="table">
                 <option>未選択</option>
                 {{ $t := index .Form.table 0}}
                 {{ if eq $t "consumers"}}
@@ -85,12 +84,11 @@
         </div>
         <div class="mb-3">
           <label for="inputPassword" class="form-label">パスワード</label>
-          <input class="form-control" id="inputPassword" disabled>
-          <button id="edit-button" type="button">変更</button>
+          <div><button id="edit-button" type="button">変更</button></div>
         </div>
         <div class="mb-3">
           <label for="selectUserType" class="form-label">権限</label>
-          <select class="required form-select" aria-label="Default select example" id="selectUserType" name="table">
+          <select class="required form-select select-width" aria-label="Default select example" id="selectUserType" name="table">
               {{ if .IsConsumer }}
               <option value="consumers" selected>利用者</option>
               {{ else }}
@@ -98,14 +96,23 @@
               {{ end }}
           </select>
         </div>
-        <div class="mb-3">
+        <!-- <div class="mb-3">
           <label disabled for="inputLotteryUnits" class="form-label">抽選口数</label>
           {{ if .IsConsumer }}
           <input placeholder="半角数字で入力" class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ $user.LotteryUnits }}">
           {{ else }}
           <input class="form-control" id="inputLotteryUnits" name="lotteryUnits" disabled>
           {{ end }}
+        </div> -->
+
+        {{ if .IsConsumer }}
+        <div class="mb-3">
+          <label disabled for="inputLotteryUnits" class="form-label">抽選口数</label>
+          <input placeholder="半角数字で入力" class="form-control" id="inputLotteryUnits" name="lotteryUnits" value="{{ $user.LotteryUnits }}">
         </div>
+        {{ end }}
+
+
       <div class="text-center">
         <button type="submit" class="btn btn-outline-primary" id="submit">保存</button>
       </div>
