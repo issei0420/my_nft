@@ -3,6 +3,7 @@ package handler
 import (
 	"crypto/sha512"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -217,6 +218,21 @@ func UsrListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type data struct {
+	LastName   string
+	FirsName   string
+	Nickname   string
+	Mail       string
+	Company    string
+	Password   string
+	UserType   string
+	ImageUnits ImageUnits
+}
+
+type ImageUnits struct {
+	ImageUnits map[string]string `json:"ImageUnits"`
+}
+
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	sessionManager(w, r, "admin")
 
@@ -233,6 +249,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "POST" {
+		var d data
+		json.NewDecoder(r.Body).Decode(&d)
+		fmt.Printf("d: %v\n", d)
+		return
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

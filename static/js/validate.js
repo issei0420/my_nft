@@ -40,14 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 var lotteryUnits = 0;
 const selectUserType = document.getElementById("selectUserType")
-const inputLotteryUnits = document.getElementById("inputLotteryUnits")
 selectUserType.addEventListener("change", (e) => {
     if (selectUserType.value == "sellers") {
-      inputLotteryUnits.disabled = true;
-      inputLotteryUnits.value = "";
+      selectImage.disabled = true;
+      selectImage.value = "";
+      selectUnits.disabled = true;
+      selectUnits.value = ""
     } else {
-      inputLotteryUnits.disabled = false;
-      inputLotteryUnits.value = "0";
+      selectImage.disabled = false;
+      selectUnits.disabled = false;
     }
     e.preventDefault();
 });

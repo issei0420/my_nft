@@ -86,5 +86,29 @@ function deleteRow() {
 }
 
 function save() {
-    console.log("確認");
+
+    const data = {
+        lastName: document.getElementById("lastNameInput").value,
+        firsName: document.getElementById("firsNameInput").value,
+        nickname: document.getElementById("inputNickname").value,
+        mail: document.getElementById("inputMail").value,
+        company: document.getElementById("inputCompany").value,
+        password: document.getElementById("inputPassword").value,
+        userType: document.getElementById("selectUserType").value,
+        imageUnits: imageUnits
+    }
+
+    register(data);
+}
+
+async function register(data) {
+    url = 'http://localhost:8080/register'
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    console.log(data);
 }

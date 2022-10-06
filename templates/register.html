@@ -80,7 +80,7 @@
     </form>
     
     {{ else }}
-    <form action="/register" method="post" id="form">
+    <div id="form">
       <label for="" class="form-label mt-3">姓名</label>
       <div class="input-group  mb-3">
         <input type="text" aria-label="Last name" class="required form-control" id="lastNameInput" name="familyName">
@@ -141,9 +141,10 @@
         </table>
         
         <div class="text-center">
-          <button id="save-button" type="submit" class="btn btn-primary">保存</button>
+          <button id="save-button" class="btn btn-primary">保存</button>
         </div>
-  </form>
+      </div>
+    </div>
 
   <dialog id='dialog'>
     <div class="mb-3">rena.pngの口数を<span id="before"></span> → <span id="after"></span>に変更します。よろしいですか?</div>
