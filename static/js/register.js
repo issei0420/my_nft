@@ -11,6 +11,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 }, false);
 
+let imageUnits = {};
 
 function assign() {
 
@@ -21,25 +22,48 @@ function assign() {
         return
     }
 
+    // 画面を更新
+    if (image in imageUnits) {
+        updateRow(image, units);
+    } else {
+        addRow(image, units);
+    }
+
+    // 変数を更新
+    imageUnits[image] = units;
+    console.log(imageUnits);
+}
+
+function addRow(image, units) {
     const imageTd = document.createElement("td");
     imageTd.innerText = image;
-    const UnitsTd = document.createElement("td");
-    UnitsTd.innerText = units
+    const unitsTd = document.createElement("td");
+    unitsTd.innerText = units
+    unitsTd.setAttribute("id", image);
     const deleteTd = document.createElement("td");
     deleteTd.classList.add("bi", "bi-trash");
     deleteTd.addEventListener("click", deleteRow, false);
 
     const tr = document.createElement("tr");
     tr.appendChild(imageTd);
-    tr.appendChild(UnitsTd);
+    tr.appendChild(unitsTd);
     tr.appendChild(deleteTd);
 
     tbody.appendChild(tr);
 }
 
+function updateRow(image, units) {
+    const unitsTd = document.getElementById(image);
+    unitsTd.innerText = units;
+}
+
 function deleteRow() {
-    removeTr = this.parentNode
+    const removeTr = this.parentNode
     tbody.removeChild(removeTr);
+
+    const image = removeTr.firstChild.innerText;
+    delete imageUnits[image];
+    console.log(imageUnits);
 }
 
 function save() {
