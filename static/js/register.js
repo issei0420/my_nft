@@ -22,16 +22,11 @@ function assign() {
         return
     }
 
-    // 画面を更新
     if (image in imageUnits) {
-        updateRow(image, units);
+        updateRow(image, units, imageUnits[image]);
     } else {
         addRow(image, units);
     }
-
-    // 変数を更新
-    imageUnits[image] = units;
-    console.log(imageUnits);
 }
 
 function addRow(image, units) {
@@ -50,11 +45,35 @@ function addRow(image, units) {
     tr.appendChild(deleteTd);
 
     tbody.appendChild(tr);
+
+    imageUnits[image] = units;
+    console.log(imageUnits);
 }
 
-function updateRow(image, units) {
-    const unitsTd = document.getElementById(image);
-    unitsTd.innerText = units;
+function updateRow(image, units, unitsBefore) {
+    const before = document.getElementById("before")
+    const after = document.getElementById("after");
+    const cancelButton = document.getElementById("cancel");
+    const okButton = document.getElementById("ok");
+
+    before.innerText = unitsBefore;
+    after.innerText = units;
+
+    dialog.showModal();
+
+    okButton.onclick = () => {
+        const unitsTd = document.getElementById(image);
+        unitsTd.innerText = units;
+        dialog.close();
+
+        imageUnits[image] = units;
+        console.log(imageUnits);
+    }
+
+    cancelButton.onclick = () => {
+        dialog.close();
+        console.log(imageUnits);
+    }
 }
 
 function deleteRow() {

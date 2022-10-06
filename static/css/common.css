@@ -24,6 +24,11 @@ body {
 .theme-color {
     background-color: rgb(35, 35, 58) !important;
 }
+#dialog{
+    border: 1px solid;
+    border-radius: 5px;
+    margin: auto;
+}
 
 /* upload */
 .upload {

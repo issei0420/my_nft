@@ -144,6 +144,15 @@
           <button id="save-button" type="submit" class="btn btn-primary">保存</button>
         </div>
   </form>
+
+  <dialog id='dialog'>
+    <div class="mb-3">rena.pngの口数を<span id="before"></span> → <span id="after"></span>に変更します。よろしいですか?</div>
+    <div class="d-flex justify-content-around m-auto w-50">
+      <button type="button mx-1" class="btn btn-secondary btn-sm" id="cancel">キャンセル</button>
+      <button type="button mx-1" class="btn btn-primary btn-sm" id="ok">OK</button>
+    </div>
+  </dialog>
+
   {{ end }}
   </div>
   <script src="/static/js/validate.js"></script>
