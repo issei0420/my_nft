@@ -11,30 +11,33 @@ window.addEventListener("DOMContentLoaded", () => {
 
 }, false);
 
+// {FileName: [imageId, units]}
 let imageUnits = {};
 
 function assign() {
 
-    const image = selectImage.value;
+    const idx = selectImage.selectedIndex
+    const fileName = selectImage.options[idx].text;
+    const imageId = selectImage.value;
     const units = selectUnits.value;
 
-    if (image === "" || units === "") {
+    if (fileName === "" || units === "") {
         return
     }
 
-    if (image in imageUnits) {
-        updateRow(image, units, imageUnits[image]);
+    if (fileName in imageUnits) {
+        updateRow(fileName, imageId, units);
     } else {
-        addRow(image, units);
+        addRow(fileName, imageId, units);
     }
 }
 
-function addRow(image, units) {
+function addRow(fileName, imageId, units) {
     const imageTd = document.createElement("td");
-    imageTd.innerText = image;
+    imageTd.innerText = fileName;
     const unitsTd = document.createElement("td");
     unitsTd.innerText = units
-    unitsTd.setAttribute("id", image);
+    unitsTd.setAttribute("id", fileName);
     const deleteTd = document.createElement("td");
     deleteTd.classList.add("bi", "bi-trash");
     deleteTd.addEventListener("click", deleteRow, false);
@@ -46,27 +49,27 @@ function addRow(image, units) {
 
     tbody.appendChild(tr);
 
-    imageUnits[image] = units;
+    imageUnits[fileName] = [imageId, units];
     console.log(imageUnits);
 }
 
-function updateRow(image, units, unitsBefore) {
+function updateRow(fileName, imageId, units) {
     const before = document.getElementById("before")
     const after = document.getElementById("after");
     const cancelButton = document.getElementById("cancel");
     const okButton = document.getElementById("ok");
 
-    before.innerText = unitsBefore;
+    before.innerText = imageUnits[fileName][1];
     after.innerText = units;
 
     dialog.showModal();
 
     okButton.onclick = () => {
-        const unitsTd = document.getElementById(image);
+        const unitsTd = document.getElementById(fileName);
         unitsTd.innerText = units;
         dialog.close();
 
-        imageUnits[image] = units;
+        imageUnits[fileName] = [imageId, units];
         console.log(imageUnits);
     }
 
@@ -80,8 +83,8 @@ function deleteRow() {
     const removeTr = this.parentNode
     tbody.removeChild(removeTr);
 
-    const image = removeTr.firstChild.innerText;
-    delete imageUnits[image];
+    const fileName = removeTr.firstChild.innerText;
+    delete imageUnits[fileName];
     console.log(imageUnits);
 }
 
@@ -95,7 +98,7 @@ function save() {
         company: document.getElementById("inputCompany").value,
         password: document.getElementById("inputPassword").value,
         userType: document.getElementById("selectUserType").value,
-        imageUnits: imageUnits
+        imageUnits: imageUnits,
     }
 
     register(data);

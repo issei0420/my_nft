@@ -122,7 +122,7 @@
           <select id="image" class="form-select w-50" aria-label="Default select example">
             <option selected></option>
             {{ range .Images }}
-            <option>{{ .FileName }}</option>
+            <option value="{{ .Id }}" name="テスト">{{ .FileName }}</option>
             {{ end }}
           </select>
           <span class="input-group-text">口数</span>

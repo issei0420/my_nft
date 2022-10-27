@@ -226,12 +226,16 @@ type data struct {
 	Company    string
 	Password   string
 	UserType   string
-	ImageUnits ImageUnits
+	ImageUnits map[string][2]string `json:"ImageUnits"`
 }
 
-type ImageUnits struct {
-	ImageUnits map[string]string `json:"ImageUnits"`
-}
+// type ImageUnit struct {
+// 	ImageUnit map[string][2]string `json:"ImageUnits"`
+// }
+
+// type ImageUnits struct {
+// 	ImageUnits map[string]string `json:"ImageUnits"`
+// }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	sessionManager(w, r, "admin")
