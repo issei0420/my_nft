@@ -36,25 +36,25 @@ func ConnectDb() {
 	fmt.Println("Database Connected!")
 }
 
-func RegisterDb(fv map[string]string, xpHash string) error {
+func RegisterDb(familyName, firstName, nickname, company, mail, userType, xpHash string) error {
 	// Sellers
-	if fv["table"] == "sellers" {
+	if userType == "sellers" {
 		_, err := db.Exec("INSERT INTO sellers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
-			fv["familyName"], fv["firstName"], fv["nickname"], fv["company"], fv["mail"], xpHash)
+			familyName, firstName, nickname, company, mail, xpHash)
 		if err != nil {
 			return fmt.Errorf("RegisterDB: %v", err)
 		}
 		return nil
 		// Consumers
-	} else if fv["table"] == "consumers" {
-		_, err := db.Exec("INSERT INTO consumers (family_name, first_name, nickname, company, lottery_units, mail, password) VALUES(?, ?, ?, ?, ?, ?, ?)",
-			fv["familyName"], fv["firstName"], fv["nickname"], fv["company"], fv["lotteryUnits"], fv["mail"], xpHash)
+	} else if userType == "consumers" {
+		_, err := db.Exec("INSERT INTO consumers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
+			familyName, firstName, nickname, company, mail, xpHash)
 		if err != nil {
 			return fmt.Errorf("RegisterDB: %v", err)
 		}
 		return nil
 	} else {
-		return fmt.Errorf("RegisterDb: no such table %s", fv["table"])
+		return fmt.Errorf("RegisterDb: no such table %s", userType)
 	}
 }
 
@@ -117,7 +117,7 @@ func GetConsumerFromId(id string) (Consumer, error) {
 
 func GetAllConsumers() ([]Consumer, error) {
 	var cons []Consumer
-	rows, err := db.Query("select c.id, c.family_name, c.first_name, c.nickname, c.mail, c.company, c.lottery_units, count(portion) " +
+	rows, err := db.Query("select c.id, c.family_name, c.first_name, c.nickname, c.mail, c.company, count(portion) " +
 		"from lottery l right join consumers c on l.consumer_id = c.id " +
 		"left join portion p on l.id = p.lottery_id group by c.id")
 	if err != nil {

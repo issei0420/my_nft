@@ -19,7 +19,6 @@ CREATE TABLE consumers (
     first_name       VARCHAR(30) NOT NULL,
     nickname         VARCHAR(10) UNIQUE NOT NULL,
     company          VARCHAR(137) NOT NULL,
-    lottery_units    TINYINT NOT NULL,
     mail             VARCHAR(254) UNIQUE NOT NULL,
     password         VARCHAR(128) NOT NULL,
     created_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

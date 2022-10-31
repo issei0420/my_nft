@@ -256,48 +256,43 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		var d data
 		json.NewDecoder(r.Body).Decode(&d)
 		fmt.Printf("d: %v\n", d)
-		return
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		fmt.Printf("mail: %v\nnick: %v\n", d.Mail, d.Nickname)
+
 		// ユニーク制限のある項目の値に重複がないかチェック
-		UKMap := map[string]string{"mail": r.Form["mail"][0], "nickname": r.Form["nickname"][0]}
-		resMap, err := db.UniqueCheck(r.Form["table"][0], UKMap)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		// UKMap := map[string]string{"mail": d.Mail, "nickname": d.Nickname}
+
+		// resMap, err := db.UniqueCheck(d.UserType, UKMap)
+		// if err != nil {
+		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+		// 	return
+		// }
 
 		// 重複があればリダイレクト
-		for _, v := range resMap {
-			if v == 0 {
-				item := Item{
-					UserType: "admin",
-					ResMap:   resMap,
-					Form:     r.Form,
-				}
-				err := view.AdminTemps.ExecuteTemplate(w, "register.html", item)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				return
-			}
-		}
+		// for _, v := range resMap {
+		// 	if v == 0 {
+		// 		item := Item{
+		// 			UserType: "admin",
+		// 			ResMap:   resMap,
+		// 			Form:     r.Form,
+		// 		}
+		// 		err := view.AdminTemps.ExecuteTemplate(w, "register.html", item)
+		// 		if err != nil {
+		// 			http.Error(w, err.Error(), http.StatusInternalServerError)
+		// 			return
+		// 		}
+		// 		return
+		// 	}
+		// }
 
-		// Form Values
-		fv := map[string]string{}
-		for k, v := range r.Form {
-			fv[k] = v[0]
-		}
 		// パスワードのハッシュ化
-		xpHash := lib.MakeHash(fv["password"])
-		// 会員情報の登録
-		if err := db.RegisterDb(fv, xpHash); err != nil {
+		xpHash := lib.MakeHash(d.Password)
+		// usersテーブルへの追加
+		if err := db.RegisterDb(d.LastName, d.FirsName, d.Nickname, d.Mail, d.Company, d.UserType, xpHash); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		// ticketsテーブルへの追加
+
 		http.Redirect(w, r, "/usrList", http.StatusFound)
 	} else {
 
