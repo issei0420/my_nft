@@ -6,7 +6,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     getPortionTotal(imageIds).then(total => {
-        if (imageIds.length) {
+        if (imageIds.length && total != null) {
             showData = shapeData(total);
             setTooltip(showData);
         }
@@ -37,7 +37,6 @@ async function getPortionTotal(imageIds) {
 }
 
 function shapeData(total) {
-    let showData = {}
     for (elem of total) {
         showData[elem["Id"]] = {}
     }

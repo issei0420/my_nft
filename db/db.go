@@ -36,26 +36,40 @@ func ConnectDb() {
 	fmt.Println("Database Connected!")
 }
 
-func RegisterDb(familyName, firstName, nickname, company, mail, userType, xpHash string) error {
+func RegisterDb(familyName, firstName, nickname, company, mail, userType, xpHash string) (int64, error) {
 	// Sellers
 	if userType == "sellers" {
-		_, err := db.Exec("INSERT INTO sellers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
+		result, err := db.Exec("INSERT INTO sellers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
 			familyName, firstName, nickname, company, mail, xpHash)
 		if err != nil {
-			return fmt.Errorf("RegisterDB: %v", err)
+			return -1, fmt.Errorf("RegisterDB: %v", err)
 		}
-		return nil
+		id, err := result.LastInsertId()
+		if err != nil {
+			return -1, fmt.Errorf("RegisterDB: %v", err)
+		}
+		return id, nil
 		// Consumers
 	} else if userType == "consumers" {
-		_, err := db.Exec("INSERT INTO consumers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
+		result, err := db.Exec("INSERT INTO consumers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
 			familyName, firstName, nickname, company, mail, xpHash)
 		if err != nil {
-			return fmt.Errorf("RegisterDB: %v", err)
+			return -1, fmt.Errorf("RegisterDB: %v", err)
 		}
-		return nil
+		id, err := result.LastInsertId()
+		if err != nil {
+			return -1, fmt.Errorf("RegisterDB: %v", err)
+		}
+		return id, nil
 	} else {
-		return fmt.Errorf("RegisterDb: no such table %s", userType)
+		return -1, fmt.Errorf("RegisterDb: no such table %s", userType)
 	}
+}
+
+func InsertTickets(id int64, imageUnits map[string][2]string) error {
+	fmt.Printf("id: %v\n", id)
+	fmt.Printf("imageUnits: %v\n", imageUnits)
+	return nil
 }
 
 func UniqueCheck(table string, UKMap map[string]string) (map[string]int, error) {
@@ -126,7 +140,7 @@ func GetAllConsumers() ([]Consumer, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var con Consumer
-		if err := rows.Scan(&con.Id, &con.FamilyName, &con.FirstName, &con.Nickname, &con.Mail, &con.Company, &con.LotteryUnits, &con.ImgNum); err != nil {
+		if err := rows.Scan(&con.Id, &con.FamilyName, &con.FirstName, &con.Nickname, &con.Mail, &con.Company, &con.ImgNum); err != nil {
 			return nil, fmt.Errorf("getAllConsumers: %v", err)
 		}
 		cons = append(cons, con)

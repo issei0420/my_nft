@@ -229,14 +229,6 @@ type data struct {
 	ImageUnits map[string][2]string `json:"ImageUnits"`
 }
 
-// type ImageUnit struct {
-// 	ImageUnit map[string][2]string `json:"ImageUnits"`
-// }
-
-// type ImageUnits struct {
-// 	ImageUnits map[string]string `json:"ImageUnits"`
-// }
-
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	sessionManager(w, r, "admin")
 
@@ -256,7 +248,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		var d data
 		json.NewDecoder(r.Body).Decode(&d)
 		fmt.Printf("d: %v\n", d)
-		fmt.Printf("mail: %v\nnick: %v\n", d.Mail, d.Nickname)
 
 		// ユニーク制限のある項目の値に重複がないかチェック
 		// UKMap := map[string]string{"mail": d.Mail, "nickname": d.Nickname}
@@ -287,12 +278,17 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		// パスワードのハッシュ化
 		xpHash := lib.MakeHash(d.Password)
 		// usersテーブルへの追加
-		if err := db.RegisterDb(d.LastName, d.FirsName, d.Nickname, d.Mail, d.Company, d.UserType, xpHash); err != nil {
+
+		id, err := db.RegisterDb(d.LastName, d.FirsName, d.Nickname, d.Mail, d.Company, d.UserType, xpHash)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		// ticketsテーブルへの追加
-
+		if err := db.InsertTickets(id, d.ImageUnits); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		http.Redirect(w, r, "/usrList", http.StatusFound)
 	} else {
 
