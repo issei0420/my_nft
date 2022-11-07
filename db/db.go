@@ -67,8 +67,12 @@ func RegisterDb(familyName, firstName, nickname, company, mail, userType, xpHash
 }
 
 func InsertTickets(id int64, imageUnits map[string][2]string) error {
-	fmt.Printf("id: %v\n", id)
-	fmt.Printf("imageUnits: %v\n", imageUnits)
+	for _, v := range imageUnits {
+		_, err := db.Exec("INSERT INTO tickets (consumer_id, image_id, lottery_units) values(?, ?, ?)", id, v[0], v[1])
+		if err != nil {
+			return fmt.Errorf("InsertTickets: %v", err)
+		}
+	}
 	return nil
 }
 

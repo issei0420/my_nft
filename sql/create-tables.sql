@@ -32,8 +32,6 @@ CREATE TABLE tickets (
     consumer_id      INT NOT NULL,
     image_id         INT NOT NULL,
     lottery_units    TINYINT NOT NULL,
-    mail             VARCHAR(254) UNIQUE NOT NULL,
-    password         VARCHAR(128) NOT NULL,
     created_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),

@@ -277,18 +277,21 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 		// パスワードのハッシュ化
 		xpHash := lib.MakeHash(d.Password)
-		// usersテーブルへの追加
-
+		// テーブルへの追加
 		id, err := db.RegisterDb(d.LastName, d.FirsName, d.Nickname, d.Mail, d.Company, d.UserType, xpHash)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
+		}
+		if d.UserType == "sellers" {
+			http.Redirect(w, r, "/usrList", http.StatusFound)
 		}
 		// ticketsテーブルへの追加
 		if err := db.InsertTickets(id, d.ImageUnits); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		fmt.Println("##############################")
 		http.Redirect(w, r, "/usrList", http.StatusFound)
 	} else {
 
