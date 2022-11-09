@@ -50,7 +50,6 @@ function addRow(fileName, imageId, units) {
     tbody.appendChild(tr);
 
     imageUnits[fileName] = [imageId, units];
-    console.log(imageUnits);
 }
 
 function updateRow(fileName, imageId, units) {
@@ -70,12 +69,10 @@ function updateRow(fileName, imageId, units) {
         dialog.close();
 
         imageUnits[fileName] = [imageId, units];
-        console.log(imageUnits);
     }
 
     cancelButton.onclick = () => {
         dialog.close();
-        console.log(imageUnits);
     }
 }
 
@@ -85,7 +82,6 @@ function deleteRow() {
 
     const fileName = removeTr.firstChild.innerText;
     delete imageUnits[fileName];
-    console.log(imageUnits);
 }
 
 function save() {
@@ -113,5 +109,5 @@ async function register(data) {
         },
         body: JSON.stringify(data)
     });
-    console.log(data);
+    location = res.url;
 }
