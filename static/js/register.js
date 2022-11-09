@@ -87,7 +87,7 @@ function deleteRow() {
 function save() {
 
     const data = {
-        lastName: document.getElementById("lastNameInput").value,
+        familyName: document.getElementById("familyNameInput").value,
         firsName: document.getElementById("firsNameInput").value,
         nickname: document.getElementById("inputNickname").value,
         mail: document.getElementById("inputMail").value,
@@ -109,5 +109,27 @@ async function register(data) {
         },
         body: JSON.stringify(data)
     });
-    location = res.url;
+    const resObj = await res.json();
+
+    if (resObj["invalid"]) {
+        invalidMessage(resObj["resmap"]);
+    } else {
+        window.alert("登録が完了しました")
+    }
+}
+
+function invalidMessage(resMap) {
+    console.log(resMap);
+    const mailAlert = document.getElementById("mail-alert");
+    const nicknameAlert = document.getElementById("nickname-alert")
+    if (resMap["mail"] == 0) {
+        mailAlert.innerText = "このメールアドレスはすでに登録されています。"
+    } else {
+        mailAlert.innerText = ""
+    }
+    if (resMap["nickname"] == 0) {
+        nicknameAlert.innerText = "このニックネームはすでに登録されています";
+    } else {
+        nicknameAlert.innerText = ""
+    }
 }

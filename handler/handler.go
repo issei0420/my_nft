@@ -219,8 +219,8 @@ func UsrListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type data struct {
-	LastName   string
-	FirsName   string
+	FamilyName string
+	FirstName  string
 	Nickname   string
 	Mail       string
 	Company    string
@@ -236,50 +236,74 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		UserType string
 		ResMap   map[string]int
 		Images   []db.ImageNames
-		Form     url.Values
-		Array    [100]int
+		Data     data
+		Array    [100]int // 抽選口数0-100
+	}
+
+	var imgs []db.ImageNames
+	imgs, err := db.GetAllImageNames()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var array [100]int
+	for i := 0; i < 100; i++ {
+		array[i] = i + 1
 	}
 
 	if err := view.AdminParse(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	if r.Method == "POST" {
 		var d data
 		json.NewDecoder(r.Body).Decode(&d)
-		fmt.Printf("d: %v\n", d)
 
 		// ユニーク制限のある項目の値に重複がないかチェック
-		// UKMap := map[string]string{"mail": d.Mail, "nickname": d.Nickname}
+		UKMap := map[string]string{"mail": d.Mail, "nickname": d.Nickname}
 
-		// resMap, err := db.UniqueCheck(d.UserType, UKMap)
-		// if err != nil {
-		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-		// 	return
-		// }
+		resMap, err := db.UniqueCheck(d.UserType, UKMap)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-		// 重複があればリダイレクト
-		// for _, v := range resMap {
-		// 	if v == 0 {
-		// 		item := Item{
-		// 			UserType: "admin",
-		// 			ResMap:   resMap,
-		// 			Form:     r.Form,
-		// 		}
-		// 		err := view.AdminTemps.ExecuteTemplate(w, "register.html", item)
-		// 		if err != nil {
-		// 			http.Error(w, err.Error(), http.StatusInternalServerError)
-		// 			return
-		// 		}
-		// 		return
-		// 	}
-		// }
+		// 重複があればフォームを再表示
+		var invalid bool
+		for _, v := range resMap {
+			if v == 0 {
+				invalid = true
+				break
+			}
+		}
+
+		type response struct {
+			Invalid int            `json:"invalid"`
+			ResMap  map[string]int `json:"resmap"`
+		}
+
+		if invalid {
+			res := response{
+				Invalid: 1,
+				ResMap:  resMap,
+			}
+			b, err := json.MarshalIndent(res, "", "\t")
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Write(b)
+			return
+		}
 
 		// パスワードのハッシュ化
 		xpHash := lib.MakeHash(d.Password)
 		// テーブルへの追加
-		id, err := db.RegisterDb(d.LastName, d.FirsName, d.Nickname, d.Mail, d.Company, d.UserType, xpHash)
+		id, err := db.RegisterDb(d.FamilyName, d.FirstName, d.Nickname, d.Mail, d.Company, d.UserType, xpHash)
 		if err != nil {
+			log.Fatal((err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -288,25 +312,28 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// ticketsテーブルへの追加
 		if err := db.InsertTickets(id, d.ImageUnits); err != nil {
+			log.Fatal(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("##############################")
-		http.Redirect(w, r, "/usrList", http.StatusFound)
-	} else {
 
-		var imgs []db.ImageNames
-		imgs, err := db.GetAllImageNames()
+		res := response{
+			Invalid: 0,
+		}
+		b, err := json.MarshalIndent(res, "", "\t")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		var array [100]int
-		for i := 0; i < 100; i++ {
-			array[i] = i + 1
-		}
+		w.Write(b)
 
-		item := Item{UserType: "admin", Images: imgs, Form: nil, Array: array}
+	} else {
+		item := Item{
+			UserType: "admin",
+			Images:   imgs,
+			Array:    array,
+			ResMap:   map[string]int{"mail": 1, "nickname": 1},
+		}
 		err = view.AdminTemps.ExecuteTemplate(w, "register.html", item)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
