@@ -1,4 +1,7 @@
 window.addEventListener('DOMContentLoaded', function() {
+
+    getImageUnits()
+
     const editButton = document.getElementById("edit-button")
     const userId = document.getElementById("user-id").value
     const userType = document.getElementById("selectUserType").value
@@ -29,4 +32,8 @@ async function updatePass(data) {
     })
     
     return res.json();
+}
+
+async function getImageUnits() {
+    console.log("log");
 }

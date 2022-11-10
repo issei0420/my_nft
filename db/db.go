@@ -94,15 +94,21 @@ func UniqueCheck(table string, UKMap map[string]string) (map[string]int, error) 
 	return resMap, nil
 }
 
+type ImageUnit struct {
+	ImageId      int
+	LotteryUnits int
+	Filename     string
+}
+
 type Consumer struct {
-	Id           int
-	FamilyName   string
-	FirstName    string
-	Nickname     string
-	Mail         string
-	Company      string
-	LotteryUnits string
-	ImgNum       string
+	Id         int
+	FamilyName string
+	FirstName  string
+	Nickname   string
+	Mail       string
+	Company    string
+	ImageUnits []ImageUnit
+	ImgNum     string
 }
 
 type Seller struct {
@@ -122,14 +128,33 @@ type User struct {
 
 func GetConsumerFromId(id string) (Consumer, error) {
 	var c Consumer
-	row := db.QueryRow("SELECT id, family_name, first_name, nickname, mail, company, lottery_units FROM consumers where id = ?", id)
-	err := row.Scan(&c.Id, &c.FamilyName, &c.FirstName, &c.Nickname, &c.Mail, &c.Company, &c.LotteryUnits)
+	row := db.QueryRow("SELECT id, family_name, first_name, nickname, mail, company FROM consumers where id = ?", id)
+	err := row.Scan(&c.Id, &c.FamilyName, &c.FirstName, &c.Nickname, &c.Mail, &c.Company)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return c, fmt.Errorf("GetConsumerFromId %s: No such consumer", id)
 		}
 		return c, fmt.Errorf("GetConsumerFromId %s: %v", id, err)
 	}
+
+	// imageUnits取得
+	var imageUnits []ImageUnit
+	rows, err := db.Query("select t.image_id, t.lottery_units, i.file_name from tickets t inner join images i on t.image_id = i.id where t.consumer_id = ?", id)
+	if err != nil {
+		return c, fmt.Errorf("GetConsumerFromid imageUnits取得: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var iu ImageUnit
+		if err := rows.Scan(&iu.ImageId, &iu.LotteryUnits, &iu.Filename); err != nil {
+			return c, fmt.Errorf("GetConsumerFromid imageUnits取得: %v", err)
+		}
+		imageUnits = append(imageUnits, iu)
+	}
+	if err := rows.Err(); err != nil {
+		return c, fmt.Errorf("GetConsumerFromid imageUnits取得: %v", err)
+	}
+	c.ImageUnits = imageUnits
 	return c, nil
 }
 

@@ -343,6 +343,19 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditHandler(w http.ResponseWriter, r *http.Request) {
+
+	var imgs []db.ImageNames
+	imgs, err := db.GetAllImageNames()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var array [100]int
+	for i := 0; i < 100; i++ {
+		array[i] = i + 1
+	}
+
 	if r.Method == "POST" {
 
 		if err := r.ParseForm(); err != nil {
@@ -433,6 +446,7 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 		if utype == "consumer" {
 			var c db.Consumer
 			c, err := db.GetConsumerFromId(id)
+			fmt.Printf("c(handler): %v\n", c)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -460,13 +474,16 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 			UserType   string
 			Form       string
 			IsConsumer bool
+			Images     []db.ImageNames
+			Array      [100]int
 		}{
 			User:       u,
 			UserType:   "admin",
 			Form:       "",
 			IsConsumer: ic,
+			Images:     imgs,
+			Array:      array,
 		}
-
 		err := view.AdminTemps.ExecuteTemplate(w, "edit.html", item)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
