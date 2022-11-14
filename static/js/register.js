@@ -11,8 +11,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 }, false);
 
-// {FileName: [imageId, units]}
-
+let imageUnits = {};
 
 function assign() {
 
@@ -122,12 +121,12 @@ function invalidMessage(resMap) {
     const mailAlert = document.getElementById("mail-alert");
     const nicknameAlert = document.getElementById("nickname-alert")
     if (resMap["mail"] == 0) {
-        mailAlert.innerText = "このメールアドレスはすでに登録されています。"
+        mailAlert.innerText = "このメールアドレスはすでに登録されています"
     } else {
         mailAlert.innerText = ""
     }
     if (resMap["nickname"] == 0) {
-        nicknameAlert.innerText = "このニックネームはすでに登録されています";
+        nicknameAlert.innerText = "このニックネームはすでに登録されています"
     } else {
         nicknameAlert.innerText = ""
     }

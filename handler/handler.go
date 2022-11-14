@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"nft-site/db"
 	"nft-site/lib"
 	"nft-site/view"
@@ -218,17 +217,6 @@ func UsrListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type data struct {
-	FamilyName string
-	FirstName  string
-	Nickname   string
-	Mail       string
-	Company    string
-	Password   string
-	UserType   string
-	ImageUnits map[string][2]string `json:"ImageUnits"`
-}
-
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	sessionManager(w, r, "admin")
 
@@ -236,7 +224,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		UserType string
 		ResMap   map[string]int
 		Images   []db.ImageNames
-		Data     data
+		Data     db.Data
 		Array    [100]int // 抽選口数0-100
 	}
 
@@ -258,7 +246,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "POST" {
-		var d data
+		var d db.Data
 		json.NewDecoder(r.Body).Decode(&d)
 
 		// ユニーク制限のある項目の値に重複がないかチェック
@@ -357,15 +345,14 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "POST" {
-
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
+		var d db.Data
+		json.NewDecoder(r.Body).Decode(&d)
+		fmt.Printf("d: %v\n", d)
 		var u db.User
-		id := r.Form["id"][0]
-		table := r.Form["table"][0]
+		id := d.Id
+		table := d.UserType
+		UKMap := make(map[string]string)
+
 		if table == "consumers" {
 			var c db.Consumer
 			c, err := db.GetConsumerFromId(id)
@@ -376,6 +363,13 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 			u = db.User{
 				Consumer: c,
 			}
+			// ニックネームやメールアドレスが変更されている場合はUKMapに追加し、あとで重複を確認
+			if u.Consumer.Nickname != d.Nickname {
+				UKMap["nickname"] = d.Nickname
+			}
+			if u.Consumer.Mail != d.Mail {
+				UKMap["mail"] = d.Mail
+			}
 		} else {
 			var s db.Seller
 			s, err := db.GetSellerFromId(id)
@@ -385,55 +379,64 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 			u = db.User{
 				Seller: s,
 			}
-		}
-
-		// 重複チェック
-		diffMap := lib.CheckDiff(u, r.Form)
-		UKMap := make(map[string]string)
-		if 1 <= len(diffMap) {
-			for k := range diffMap {
-				if k == "nickname" || k == "mail" {
-					UKMap[k] = diffMap[k]
-				}
+			// ニックネームやメールアドレスが変更されている場合はUKMapに追加し、あとで重複を確認
+			if u.Seller.Nickname != d.Nickname {
+				UKMap["nickname"] = d.Nickname
+			}
+			if u.Seller.Mail != d.Mail {
+				UKMap["mail"] = d.Mail
 			}
 		}
 
-		if 1 <= len(UKMap) {
-			resMap, err := db.UniqueCheck(table, UKMap)
+		// ユニーク制限のある項目の値に重複がないかチェック
+		resMap, err := db.UniqueCheck(table, UKMap)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// 重複があればフォームにエラーを表示
+		var invalid bool
+		for _, v := range resMap {
+			if v == 0 {
+				invalid = true
+				break
+			}
+		}
+
+		type response struct {
+			Invalid int            `json:"invalid"`
+			ResMap  map[string]int `json:"resmap"`
+		}
+
+		if invalid {
+			res := response{
+				Invalid: 1,
+				ResMap:  resMap,
+			}
+			b, err := json.MarshalIndent(res, "", "\t")
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			type Item struct {
-				Id       string
-				UserType string
-				ResMap   map[string]int
-				Form     url.Values
-			}
-			// 重複があればリダイレクト
-			for _, v := range resMap {
-				if v == 0 {
-					item := Item{
-						Id:       "id",
-						UserType: "admin",
-						ResMap:   resMap,
-						Form:     r.Form,
-					}
-					err := view.AdminTemps.ExecuteTemplate(w, "edit.html", item)
-					if err != nil {
-						http.Error(w, err.Error(), http.StatusInternalServerError)
-						return
-					}
-					return
-				}
-			}
+			w.Write(b)
+			return
 		}
-		if 1 <= len(diffMap) {
-			err := db.UpdateUser(diffMap, id, table)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+
+		res := response{
+			Invalid: 0,
+		}
+		b, err := json.MarshalIndent(res, "", "\t")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(b)
+
+		err = db.UpdateUser(d, id, table)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		http.Redirect(w, r, "/usrList", http.StatusFound)
 

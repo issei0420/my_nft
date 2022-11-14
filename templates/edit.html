@@ -9,20 +9,22 @@
   {{ else }}
     {{ $user = .User.Seller }}
   {{ end }}
-  <form action="/edit" method="post" id="form">
+  <div id="form">
     <input type="hidden" value="{{ $user.Id }}" name="id" id="user-id">
     <label for="" class="form-label mt-3">姓名</label>
     <div class="input-group  mb-3">
-      <input type="text" aria-label="Last name" class="required form-control" id="lastNameInput" name="familyName" value="{{ $user.FamilyName }}">
+      <input type="text" aria-label="Last name" class="required form-control" id="familyNameInput" name="familyName" value="{{ $user.FamilyName }}">
       <input type="text" aria-label="First name" class="required form-control" id="firsNameInput" name="firstName" value="{{ $user.FirstName }}">
     </div>
     <div class="mb-3">
       <label for="inputNickname" class="form-label">ニックネーム</label>
       <input type="" class="required form-control" id="inputNickname" name="nickname" value="{{ $user.Nickname }}">
+      <p class="text-danger" id="nickname-alert"></p>
     </div>
     <div class="mb-3">
       <label for="inputMail" class="form-label">メールアドレス</label>
       <input type="email" class="required form-control" id="inputMail" name="mail" value="{{ $user.Mail }}">
+      <p class="text-danger" id="mail-alert"></p>
     </div>
     <div class="mb-3">
       <label for="inputCompany" class="form-label">会社名</label>
@@ -43,8 +45,6 @@
       </select>
     </div>
 
-    <script src="/static/js/validate.js"></script>
-    <script src="/static/js/edit.js"></script>
     {{ if .IsConsumer }}
 
     <label disabled for="inputLotteryUnits" class="form-label">口数設定</label>
@@ -69,7 +69,7 @@
       <table class="table">
         <tbody id="tbody">
           {{ range .User.ImageUnits }}
-          <tr class="image-units"><td class="file-name" value="{{ .ImageId }}">{{ .Filename }}</td><td id="rena.png" class="lottery-units">{{ .LotteryUnits }}</td><td class="bi bi-trash"></td></tr>
+          <tr class="image-units"><td class="file-name" value="{{ .ImageId }}">{{ .Filename }}</td><td class="lottery-units">{{ .LotteryUnits }}</td></tr>
           {{ end }}
         </tbody>
       </table>
@@ -83,12 +83,11 @@
       </dialog>
       
       {{ end }}
-  <div class="text-center">
-    <button type="submit" class="btn btn-outline-primary" id="update-button">保存</button>
-  </div>
-  </form>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary" id="update-button">保存</button>
+    </div>
+  </div>  
 </div>
     <script src="/static/js/validate.js"></script>
     <script src="/static/js/edit.js"></script>
-    <script src="/static/js/register.js"></script>
 {{ template "footer" .}}

@@ -180,17 +180,8 @@ func GetAllConsumers() ([]Consumer, error) {
 	return cons, nil
 }
 
-func UpdateUser(diffMap map[string]string, id, table string) error {
-	st := ""
-	for k, v := range diffMap {
-		st += fmt.Sprintf(" %s = \"%s\",", k, v)
-	}
-	st = st[:len(st)-1]
-	sq := fmt.Sprintf("UPDATE %s SET %s WHERE id = ?", table, st)
-	_, err := db.Exec(sq, id)
-	if err != nil {
-		return fmt.Errorf("UpdateConsumer: %v", err)
-	}
+func UpdateUser(d Data, id, table string) error {
+	sq := fmt.Sprintf("Update ")
 	return nil
 }
 
@@ -573,4 +564,17 @@ func GetAllImageNames() ([]ImageNames, error) {
 		return nil, fmt.Errorf("GetAllImageNames: %v", err)
 	}
 	return imgs, nil
+}
+
+// handler.goとlib.goで使用する
+type Data struct {
+	Id         string
+	FamilyName string
+	FirstName  string
+	Nickname   string
+	Mail       string
+	Company    string
+	Password   string
+	UserType   string
+	ImageUnits map[string][2]string `json:"ImageUnits"`
 }
