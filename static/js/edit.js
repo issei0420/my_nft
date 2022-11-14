@@ -1,6 +1,6 @@
 window.addEventListener('DOMContentLoaded', function() {
 
-    getImageUnits()
+    initializeImageUnits()
 
     const editButton = document.getElementById("edit-button")
     const userId = document.getElementById("user-id").value
@@ -34,6 +34,17 @@ async function updatePass(data) {
     return res.json();
 }
 
-async function getImageUnits() {
-    console.log("log");
+let imageUnits = {};
+async function initializeImageUnits() {
+    TrImageUnits = document.getElementsByClassName("image-units");
+    for (var tr of TrImageUnits) {
+        const tdFileName = tr.getElementsByClassName("file-name");
+        const tdLotteryUnits = tr.getElementsByClassName("lottery-units");
+        fileName = tdFileName[0].innerText;
+        imageId = tdFileName[0].getAttribute('value');
+        lotteryUnits = tdLotteryUnits[0].innerText;
+
+        imageUnits[fileName] = [imageId, lotteryUnits]
+    }
+    console.log(imageUnits);
 }

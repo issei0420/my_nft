@@ -12,7 +12,7 @@ window.addEventListener("DOMContentLoaded", () => {
 }, false);
 
 // {FileName: [imageId, units]}
-let imageUnits = {};
+
 
 function assign() {
 
@@ -119,7 +119,6 @@ async function register(data) {
 }
 
 function invalidMessage(resMap) {
-    console.log(resMap);
     const mailAlert = document.getElementById("mail-alert");
     const nicknameAlert = document.getElementById("nickname-alert")
     if (resMap["mail"] == 0) {

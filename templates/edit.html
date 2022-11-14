@@ -69,7 +69,7 @@
       <table class="table">
         <tbody id="tbody">
           {{ range .User.ImageUnits }}
-          <tr><td>{{ .Filename }}</td><td id="rena.png">{{ .LotteryUnits }}</td><td class="bi bi-trash"></td></tr>
+          <tr class="image-units"><td class="file-name" value="{{ .ImageId }}">{{ .Filename }}</td><td id="rena.png" class="lottery-units">{{ .LotteryUnits }}</td><td class="bi bi-trash"></td></tr>
           {{ end }}
         </tbody>
       </table>
@@ -84,10 +84,11 @@
       
       {{ end }}
   <div class="text-center">
-    <button type="submit" class="btn btn-outline-primary" id="submit">保存</button>
+    <button type="submit" class="btn btn-outline-primary" id="update-button">保存</button>
   </div>
   </form>
 </div>
     <script src="/static/js/validate.js"></script>
     <script src="/static/js/edit.js"></script>
+    <script src="/static/js/register.js"></script>
 {{ template "footer" .}}
