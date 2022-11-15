@@ -181,7 +181,12 @@ func GetAllConsumers() ([]Consumer, error) {
 }
 
 func UpdateUser(d Data, id, table string) error {
-	sq := fmt.Sprintf("Update ")
+	sq := fmt.Sprintf("UPDATE %s SET family_name = ?, first_name = ?, nickname = ?, company = ?, mail = ? where id = ?", table)
+	fmt.Printf("sq: %v\n", sq)
+	_, err := db.Exec(sq, d.FamilyName, d.FirstName, d.Nickname, d.Company, d.Mail, id)
+	if err != nil {
+		return fmt.Errorf("updateuser: %v", err)
+	}
 	return nil
 }
 

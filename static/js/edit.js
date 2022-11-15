@@ -104,6 +104,7 @@ function addRow(fileName, imageId, units) {
 }
 
 function updateRow(fileName, imageId, units) {
+    console.log("fileName" + fileName);
     const before = document.getElementById("before")
     const after = document.getElementById("after");
     const cancelButton = document.getElementById("cancel");
@@ -117,7 +118,6 @@ function updateRow(fileName, imageId, units) {
     okButton.onclick = () => {
         const unitsTd = document.getElementById(fileName);
         unitsTd.innerText = units;
-        dialog.close();
 
         imageUnits[fileName] = [imageId, units];
     }
@@ -140,14 +140,14 @@ function update() {
     const data = {
         id: document.getElementById("user-id").value,
         familyName: document.getElementById("familyNameInput").value,
-        firsName: document.getElementById("firsNameInput").value,
+        firstName: document.getElementById("firstNameInput").value,
         nickname: document.getElementById("inputNickname").value,
         mail: document.getElementById("inputMail").value,
         company: document.getElementById("inputCompany").value,
         userType: document.getElementById("selectUserType").value,
         imageUnits: imageUnits,
     }
-
+    console.log(data);
     send(data);
 }
 

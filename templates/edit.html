@@ -14,7 +14,7 @@
     <label for="" class="form-label mt-3">姓名</label>
     <div class="input-group  mb-3">
       <input type="text" aria-label="Last name" class="required form-control" id="familyNameInput" name="familyName" value="{{ $user.FamilyName }}">
-      <input type="text" aria-label="First name" class="required form-control" id="firsNameInput" name="firstName" value="{{ $user.FirstName }}">
+      <input type="text" aria-label="First name" class="required form-control" id="firstNameInput" name="firstName" value="{{ $user.FirstName }}">
     </div>
     <div class="mb-3">
       <label for="inputNickname" class="form-label">ニックネーム</label>
@@ -69,7 +69,7 @@
       <table class="table">
         <tbody id="tbody">
           {{ range .User.ImageUnits }}
-          <tr class="image-units"><td class="file-name" value="{{ .ImageId }}">{{ .Filename }}</td><td class="lottery-units">{{ .LotteryUnits }}</td></tr>
+          <tr class="image-units"><td class="file-name" value="{{ .ImageId }}">{{ .Filename }}</td><td id="{{ .Filename }}" class="lottery-units">{{ .LotteryUnits }}</td></tr>
           {{ end }}
         </tbody>
       </table>
