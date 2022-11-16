@@ -716,26 +716,22 @@ func LotteryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MyImgListHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-
-	} else {
-		mail, utype := sessionManager(w, r, "consumer")
-		myImgs, err := db.GetAllMyImages(mail)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		item := struct {
-			UserType string
-			MyImgs   []db.MyImage
-		}{
-			UserType: utype,
-			MyImgs:   myImgs,
-		}
-		err = view.ConsumerTemps.ExecuteTemplate(w, "myImgList.html", item)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+	mail, utype := sessionManager(w, r, "consumer")
+	myImgs, err := db.GetAllMyImages(mail)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	item := struct {
+		UserType string
+		MyImgs   []db.MyImage
+	}{
+		UserType: utype,
+		MyImgs:   myImgs,
+	}
+	err = view.ConsumerTemps.ExecuteTemplate(w, "myImgList.html", item)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
