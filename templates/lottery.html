@@ -6,20 +6,17 @@
     <form action="/lottery" method="post" class="mt-3">
           <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">抽選画像</label>
-            <select class="form-select" aria-label="Default select example" name="imageId">
+            <select id="selectImage" class="form-select" aria-label="Default select example" name="imageId">
                 <option selected>未選択</option>
                 {{ range .Images }}
-                <option value="{{ .Id }}">{{ .Filename }}</option>
+                <option class="{{ .LotteryUnits }}" id="optionFilename" value="{{ .Id }}">{{ .Filename }}</option>
                 {{ end }}
             </select>
           </div>
           <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">応募口数</label>
-            <select class="form-select" aria-label="Default select example" name="units">
+            <select class="form-select" aria-label="Default select example" name="units" id="selectUnits">
                 <option selected>未選択</option>
-                {{ range $v := .Units}}
-                <option value="{{$v}}">{{ $v }}</option>
-                {{ end }}
             </select>
           </div>
           <div class="text-center">
@@ -27,4 +24,5 @@
           </div>
     </form>
 </div>
+<script src="/static/js/lottery.js"></script>
 {{ template "footer" .}}

@@ -688,30 +688,21 @@ func LotteryHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		mail, utype := sessionManager(w, r, "consumer")
 		view.ConsumerParse()
-		// get all images
-		imgs, err := db.GetAllImages()
+
+		var images []db.LotteryImage
+		images, err := db.GetImages(mail)
+
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		// get Units
-		units, err := db.GetUnits(mail)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		var unitsSlice []int
-		for i := 0; i < units; i++ {
-			unitsSlice = append(unitsSlice, i+1)
-		}
+
 		item := struct {
 			UserType string
-			Images   []db.Image
-			Units    []int
+			Images   []db.LotteryImage
 		}{
 			UserType: utype,
-			Images:   imgs,
-			Units:    unitsSlice,
+			Images:   images,
 		}
 		err = view.ConsumerTemps.ExecuteTemplate(w, "lottery.html", item)
 		if err != nil {

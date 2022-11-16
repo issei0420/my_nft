@@ -182,7 +182,6 @@ func GetAllConsumers() ([]Consumer, error) {
 
 func UpdateUser(d Data, id, table string) error {
 	sq := fmt.Sprintf("UPDATE %s SET family_name = ?, first_name = ?, nickname = ?, company = ?, mail = ? where id = ?", table)
-	fmt.Printf("sq: %v\n", sq)
 	_, err := db.Exec(sq, d.FamilyName, d.FirstName, d.Nickname, d.Company, d.Mail, id)
 	if err != nil {
 		return fmt.Errorf("updateuser: %v", err)
@@ -367,16 +366,27 @@ func GetPortion(imageId string) ([]uint8, error) {
 	return soldP, nil
 }
 
-func GetUnits(mail string) (int, error) {
-	row := db.QueryRow("SELECT lottery_units FROM consumers WHERE mail = ?", mail)
-	var units int
-	if err := row.Scan(&units); err != nil {
-		if err == sql.ErrNoRows {
-			return 0, fmt.Errorf("GetUnits %s: No such consumer", mail)
-		}
-		return 0, fmt.Errorf("GetUnits %s: %v", mail, err)
+type LotteryImage struct {
+	Id           int
+	Filename     string
+	LotteryUnits int
+}
+
+func GetImages(mail string) ([]LotteryImage, error) {
+	var images []LotteryImage
+	rows, err := db.Query("select i.id, i.file_name, t.lottery_units from tickets t left join images i on t.image_id = i.id left join consumers c on t.consumer_id = c.id where c.mail = ?", mail)
+	if err != nil {
+		return nil, fmt.Errorf("GetImages: %v", err)
 	}
-	return units, nil
+	defer rows.Close()
+	for rows.Next() {
+		var image LotteryImage
+		if err := rows.Scan(&image.Id, &image.Filename, &image.LotteryUnits); err != nil {
+			return nil, fmt.Errorf("GetImages: %v", err)
+		}
+		images = append(images, image)
+	}
+	return images, nil
 }
 
 func UpdateUnits(mail string, units int) error {
@@ -406,9 +416,6 @@ func GetAllMyImages(mail string) ([]MyImage, error) {
 			return nil, fmt.Errorf("GetAllMyImages: %v", err)
 		}
 		myImgs = append(myImgs, myImg)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("GetAllMyImages: %v", err)
 	}
 	return myImgs, nil
 }
