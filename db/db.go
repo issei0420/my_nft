@@ -389,8 +389,8 @@ func GetImages(mail string) ([]LotteryImage, error) {
 	return images, nil
 }
 
-func UpdateUnits(mail string, units int) error {
-	_, err := db.Exec("UPDATE consumers SET lottery_units = lottery_units - ? WHERE mail=?", units, mail)
+func UpdateUnits(mail, imageId string, units int) error {
+	_, err := db.Exec("update tickets t left join consumers c on t.consumer_id = c.id set t.lottery_units = t.lottery_units - ? where c.mail = ? and t.image_id = ?", units, mail, imageId)
 	if err != nil {
 		return fmt.Errorf("UpdateUnits: %v", err)
 	}

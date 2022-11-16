@@ -670,7 +670,11 @@ func LotteryHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// update lottery_units
-		db.UpdateUnits(mail, len(randP))
+		err = db.UpdateUnits(mail, imageId, len(randP))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		item := struct {
 			Units    int
 			UserType string
