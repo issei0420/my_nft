@@ -12,6 +12,7 @@ import (
 	"nft-site/lib"
 	"nft-site/view"
 	"os"
+	"strconv"
 
 	"github.com/gorilla/sessions"
 )
@@ -736,9 +737,11 @@ func MyImgListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MyImageHandler(w http.ResponseWriter, r *http.Request) {
-	mail, _ := sessionManager(w, r, "consumer")
+	sessionManager(w, r, "consumer")
 	id := r.FormValue("id")
 	fn := r.FormValue("filename")
+	p := r.FormValue("portion")
+
 	if fn == "" {
 		var err error
 		fn, err = db.GetFilenameFromId(id)
@@ -748,20 +751,29 @@ func MyImageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	getPs, err := db.GetMyPortion(id, mail)
+	// すべての抽選済み部の番号を配列(getPs)で取得する関数
+	// getPs, err := db.GetMyPortion(id, mail)
+
+	// 追加依頼②のため、今回は該当部1つのみ配列(getPs)に格納
+	num, err := strconv.Atoi(p)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Fatal(err)
 	}
+	var getPs [1]uint8
+	getPs[0] = uint8(num)
+
+	// 後の処理を効率化するため、mapに転換する
 	getP := make(map[uint8]struct{})
 	for _, v := range getPs {
-		getP[uint8(v)] = struct{}{}
+		getP[v] = struct{}{}
 	}
 
+	// 画像を処理してout/に出力
 	err = lib.ProcessImage(fn, getP)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 	item := struct {
 		UserType string
 		FileName string

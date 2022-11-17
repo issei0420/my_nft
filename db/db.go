@@ -433,7 +433,7 @@ func IsExistImage(fn string) (bool, error) {
 }
 
 func GetMyPortion(id, mail string) ([]uint8, error) {
-	var getP []uint8
+	var getPs []uint8
 	rows, err := db.Query("SELECT portion FROM lottery l INNER JOIN portion p ON l.id = p.lottery_id "+
 		"INNER JOIN consumers c ON l.consumer_id=c.id WHERE l.image_id = ? and c.mail = ?", id, mail)
 	if err != nil {
@@ -445,9 +445,9 @@ func GetMyPortion(id, mail string) ([]uint8, error) {
 		if err := rows.Scan(&p); err != nil {
 			return nil, fmt.Errorf("GetMyPortion: %v", err)
 		}
-		getP = append(getP, p)
+		getPs = append(getPs, p)
 	}
-	return getP, nil
+	return getPs, nil
 }
 
 func GetFilenameFromId(id string) (string, error) {
