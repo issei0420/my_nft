@@ -436,7 +436,11 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = db.UpdateUser(d, id, table)
 		if err != nil {
-			log.Fatal(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		err = db.UpdateTickets(d.Id, d.ImageUnits)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

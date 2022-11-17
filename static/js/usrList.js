@@ -37,6 +37,7 @@ async function getPortionTotal(imageIds) {
 }
 
 function shapeData(total) {
+    let showData = {}
     for (elem of total) {
         showData[elem["Id"]] = {}
     }

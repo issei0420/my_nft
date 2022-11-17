@@ -590,3 +590,19 @@ type Data struct {
 	UserType   string
 	ImageUnits map[string][2]string `json:"ImageUnits"`
 }
+
+func UpdateTickets(id string, ImageUnits map[string][2]string) error {
+
+	_, err := db.Exec("Delete from tickets where consumer_id = ?", id)
+	if err != nil {
+		return fmt.Errorf("UpdateUnits Delete: %v", err)
+	}
+
+	for _, v := range ImageUnits {
+		_, err := db.Exec("insert into tickets (consumer_id, image_id, lottery_units) values(?, ?, ?)", id, v[0], v[1])
+		if err != nil {
+			return fmt.Errorf("UpdateUnits: %v", err)
+		}
+	}
+	return nil
+}
