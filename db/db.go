@@ -36,11 +36,11 @@ func ConnectDb() {
 	fmt.Println("Database Connected!")
 }
 
-func RegisterDb(familyName, firstName, nickname, company, mail, userType, xpHash string) (int64, error) {
+func RegisterDb(familyName, firstName, nickname, mail, company, userType, xpHash string) (int64, error) {
 	// Sellers
 	if userType == "sellers" {
-		result, err := db.Exec("INSERT INTO sellers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
-			familyName, firstName, nickname, company, mail, xpHash)
+		result, err := db.Exec("INSERT INTO sellers (family_name, first_name, nickname, mail, company, password) VALUES(?, ?, ?, ?, ?, ?)",
+			familyName, firstName, nickname, mail, company, xpHash)
 		if err != nil {
 			return -1, fmt.Errorf("RegisterDB: %v", err)
 		}
@@ -51,8 +51,8 @@ func RegisterDb(familyName, firstName, nickname, company, mail, userType, xpHash
 		return id, nil
 		// Consumers
 	} else if userType == "consumers" {
-		result, err := db.Exec("INSERT INTO consumers (family_name, first_name, nickname, company, mail, password) VALUES(?, ?, ?, ?, ?, ?)",
-			familyName, firstName, nickname, company, mail, xpHash)
+		result, err := db.Exec("INSERT INTO consumers (family_name, first_name, nickname, mail, company, password) VALUES(?, ?, ?, ?, ?, ?)",
+			familyName, firstName, nickname, mail, company, xpHash)
 		if err != nil {
 			return -1, fmt.Errorf("RegisterDB: %v", err)
 		}
