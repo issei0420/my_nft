@@ -20,24 +20,114 @@ https://dev.mysql.com/downloads/mysql/
 CREATE DATABASE NFT;
 ```
 
-※ _db.go_ 24行目記載
+#### ユーザの作成
 
-#### 認証設定
+上記で設定したDBに対し、作業ユーザを設定する
 
-_db.go_ 20-23行目を、MySQLインストール時の設定に合わせる。
+参照：【MySQL入門】ユーザー作成の方法を解説！8.0からの変更点も紹介　https://www.sejuku.net/blog/82303　
 
 ## 起動方法
 
-### 起動
+### ローカル環境
 
-_main.go_ の存在するディレクトリで以下を実行する。
+環境変数を設定する
+```
+export DBUSER=（データベースに設定したユーザ)
+export DBPASS=（ユーザに設定したパスワード)
+```
+
+main.goの存在するディレクトリで以下を実行する。
 
 ```
-go run main.go
+go run .
 ```
 
-### アクセス
+### 検証環境
+
+環境変数を設定する
+```
+export DBUSER=aster
+export DBPASS=kym7izpzt2tV
+```
+
+nft_site/に移動し、以下を実行する。
+
+```
+./nft-site
+```
+
+## アクセス
 
 ブラウザから以下のURLにアクセスする。
 
-http://localhost:8080/
+ローカル　http://localhost:8080/admin/login　
+
+検証環境　http://3.114.104.27:8000/admin/login　
+
+
+## ソースコードの注意点
+### 管理者アカウントの認証
+
+管理者サイトの認証情報はファイルで管理しています
+
+dataディレクトリにaccnt.txtとpswd.txtとして保管されています。
+
+パスワードの暗号化にはsha512という規格のハッシュ関数を使用しています。
+
+利用者/出品者サイトには、consumers/sellersテーブルにアカウント情報を登録することで、ログインできるようになります
+
+### テンプレートの仕様
+
+各サイトのトップページ（下参照）にアクセスした際、そのサイトに必要なテンプレートファイルが一気に読み込まれます (Parsefiles view.go)
+
+管理者：/usrList
+
+利用者：/lottery
+
+出品者：/upload
+
+上記のページを経由せずに別のページURLに移動すると、画面が表示できません。(ExecuteTemplateError handler.go)
+
+### 画像処理
+
+出品側と抽選側で画像処理の流れが異なります
+
+#### 出品側の画像処理
+
+画像をアップロードした際、オリジナル画像がuploaded/に保存されます
+
+100分割された画像はout/original/ (画像名) /に保存されます。
+
+画像リストから画像を表示するときは、1枚画と抽選済み部の情報がサーバ側から送られ、フロントエンドでグレースケール化処理を行います。(image.js)
+
+#### 抽選側の画像処理
+
+保有画像一覧から画像を表示した際、サーバ側で一部グレースケールの画像が生成されます。(lib.go)
+
+lib.goでは、out/ (画像名) /に保存された分割画像をもとに一枚の画像を生成し、out直下に保存します。
+
+その画像をsrcでmyImage.htmlに埋めこみ、表示します
+
+### ローカル環境から検証環境への対応
+
+#### <mail.go> http.ListenAndServe(":8000", nil)
+
+ :8080　→　:8000
+
+#### <db.go> ConnectDb()のcfgのAddrの値
+
+localhost　→　orangebot.cluster-czickfmhh6ua.ap-northeast-1.rds.amazonaws.com
+
+#### <*.js> APIの向き
+
+localhost:8080 → 3.114.104.27:8000
+
+
+
+
+
+
+
+
+
+
