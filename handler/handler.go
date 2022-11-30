@@ -348,7 +348,6 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		var d db.Data
 		json.NewDecoder(r.Body).Decode(&d)
-		fmt.Printf("d: %v\n", d)
 		var u db.User
 		id := d.Id
 		table := d.UserType
@@ -455,7 +454,6 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 		if utype == "consumer" {
 			var c db.Consumer
 			c, err := db.GetConsumerFromId(id)
-			fmt.Printf("c(handler): %v\n", c)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -781,9 +779,11 @@ func MyImageHandler(w http.ResponseWriter, r *http.Request) {
 	item := struct {
 		UserType string
 		FileName string
+		Portion  string
 	}{
 		UserType: "consumer",
 		FileName: fn,
+		Portion:  p,
 	}
 	err = view.ConsumerTemps.ExecuteTemplate(w, "myImage.html", item)
 	if err != nil {
