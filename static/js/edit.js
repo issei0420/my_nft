@@ -137,6 +137,12 @@ function deleteRow() {
 
 
 function update() {
+
+    res = validate();
+    if (res == "invalid") {
+        return
+    }
+
     const data = {
         id: document.getElementById("user-id").value,
         familyName: document.getElementById("familyNameInput").value,
@@ -181,4 +187,40 @@ function invalidMessage(resMap) {
     } else {
         nicknameAlert.innerText = ""
     }
+}
+
+// 未入力のバリデーション(validate.jsより移植)
+
+const theForm = document.getElementById("form")
+const requiredElems = document.querySelectorAll('.required');
+const errorClassName = 'error';
+
+// エラーメッセージを表示する関数を変数に代入
+const createError = (elem, errorMessage) => {
+    const errorSpan = document.createElement('span');
+    errorSpan.classList.add(errorClassName);
+    errorSpan.setAttribute('aria-live', 'polite');
+    errorSpan.textContent = errorMessage;
+    errorSpan.style.color = "#dc3545";
+    elem.parentNode.appendChild(errorSpan);
+}    
+
+function validate() {
+    //初期化
+    const errorElems = theForm.querySelectorAll('.' + errorClassName);
+    errorElems.forEach( (elem) => {
+        elem.remove(); 
+    });
+
+    //.required を指定した要素を検証
+    let res = ""
+    requiredElems.forEach((elem) => {
+        const elemValue = elem.value.trim(); 
+        if(elemValue.length === 0) {
+            createError(elem, '入力は必須です');
+            res = "invalid";
+        }
+    });
+
+    return res
 }

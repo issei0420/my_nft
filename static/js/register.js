@@ -85,6 +85,11 @@ function deleteRow() {
 
 function save() {
 
+    res = validate();
+    if (res == "invalid") {
+        return
+    }
+
     const data = {
         familyName: document.getElementById("familyNameInput").value,
         firsName: document.getElementById("firsNameInput").value,
@@ -131,3 +136,55 @@ function invalidMessage(resMap) {
         nicknameAlert.innerText = ""
     }
 }
+
+
+// 未入力のバリデーション(validate.jsより移植)
+
+const theForm = document.getElementById("form")
+const requiredElems = document.querySelectorAll('.required');
+const errorClassName = 'error';
+
+// エラーメッセージを表示する関数を変数に代入
+const createError = (elem, errorMessage) => {
+    const errorSpan = document.createElement('span');
+    errorSpan.classList.add(errorClassName);
+    errorSpan.setAttribute('aria-live', 'polite');
+    errorSpan.textContent = errorMessage;
+    errorSpan.style.color = "#dc3545";
+    elem.parentNode.appendChild(errorSpan);
+}    
+
+function validate() {
+    //初期化
+    const errorElems = theForm.querySelectorAll('.' + errorClassName);
+    errorElems.forEach( (elem) => {
+        elem.remove(); 
+    });
+
+    //.required を指定した要素を検証
+    let res = ""
+    requiredElems.forEach((elem) => {
+        const elemValue = elem.value.trim(); 
+        if(elemValue.length === 0) {
+            createError(elem, '入力は必須です');
+            res = "invalid";
+        }
+    });
+
+    return res
+}
+
+// 権限を変更したときに口数設定を有効化・無効化
+const selectUserType = document.getElementById("selectUserType")
+selectUserType.addEventListener("change", (e) => {
+    if (selectUserType.value == "sellers") {
+      selectImage.disabled = true;
+      selectImage.value = "";
+      selectUnits.disabled = true;
+      selectUnits.value = ""
+    } else {
+      selectImage.disabled = false;
+      selectUnits.disabled = false;
+    }
+    e.preventDefault();
+});
