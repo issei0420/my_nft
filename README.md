@@ -39,6 +39,8 @@ https://drive.google.com/file/d/1y-7Kb0TTKKOD1zcEFYzRh0gF9hG_ED_g/view?usp=share
 
 カーソルを合わせると、抽選者の情報などが閲覧できます。
 
+（動作イメージ：https://drive.google.com/file/d/188WMBvdLY5teIgbIFCCqgpRu-MYQOBzr/view?usp=share_link）
+
 画像データや情報を非同期通信で取得しています。
 
 ## 事前準備
