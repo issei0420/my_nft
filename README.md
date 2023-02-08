@@ -10,6 +10,10 @@
 
 出品者：画像のアップロード
 
+## 画面動作説明
+
+https://docs.google.com/presentation/d/1-ZWBZsQzwxeDHSb0sovjB8dbGBVAEpNA7neLK5LZiQ8/edit?usp=sharing
+
 ## 使用技術
 
 Go、MySQL、HTML、CSS、JavaScript
